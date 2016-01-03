@@ -1,6 +1,29 @@
 var appAction = require('../actions/app-action');
 var appStore  = require('../stores/app-store');
 
+function descSort( a, b ) {
+
+    return a.distance - b.distance;
+
+}
+
+function intersectObject( object, raycaster, intersects, recursive ) {
+
+    if ( object.visible === false || !object.mouseEnable ) return;
+
+    object.raycast( raycaster, intersects );
+
+    if ( recursive === true ) {
+
+        var children = object.children;
+
+        for ( var i = 0, l = children.length; i < l; i ++ ) {
+            intersectObject( children[ i ], raycaster, intersects, true );
+        }
+
+    }
+}
+
 var CustomRaycaster = function(){
     THREE.Raycaster.call(this)
 
@@ -20,7 +43,6 @@ CustomRaycaster.prototype.setCamera = function(camera){
 };
 
 CustomRaycaster.prototype.update = function(mouse){
-    if(!appStore.isMouseEnable) return;
 
     this.setFromCamera(mouse, this.camera);
 
@@ -33,6 +55,28 @@ CustomRaycaster.prototype.update = function(mouse){
     }else{
         if(appStore.mouseOverProject) appAction.mouseOut();
     }
+
+}
+CustomRaycaster.prototype.intersectObjects = function ( objects, recursive ) {
+
+    var intersects = [];
+
+    if ( Array.isArray( objects ) === false ) {
+
+        console.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
+        return intersects;
+
+    }
+
+    for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+        intersectObject( objects[ i ], this, intersects, recursive );
+
+    }
+
+    intersects.sort( descSort );
+
+    return intersects;
 
 }
 

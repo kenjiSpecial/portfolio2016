@@ -17,6 +17,7 @@ var TVScene = function( ){
         }
     }
 
+
     this.rotateOnAxis ( new THREE.Vector3(0, 1, 0), -Math.PI/6);
     this.position.set( 60, 0, 280);
 
@@ -30,6 +31,8 @@ TVScene.prototype.update = function(dt){
     this.tvArr.forEach(function(tvObject){
         tvObject.update(dt);
     });
+
+    //
 
 }
 

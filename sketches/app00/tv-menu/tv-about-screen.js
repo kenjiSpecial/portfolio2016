@@ -43,7 +43,7 @@ var TVScreen = function( row, col  ){
 
     this.canvasTexture = new THREE.Texture(canvas);
     this.canvasTexture.magFilter = this.canvasTexture.minFilter = THREE.LinearFilter;
-    this.canvasTexture.needsUpdate = true;
+
 
     this.customInit();
 
@@ -66,7 +66,7 @@ var TVScreen = function( row, col  ){
 
     this.tag = 'about'; //constants.types[this.row]; //textData.text.toLowerCase();
 
-    this.drawCanvas();
+    //this.drawCanvas();
 
     this.canvasTexture.needsUpdate = true;
     this.tvMaterial.uniforms.texture.value = this.canvasTexture;
@@ -86,7 +86,6 @@ TVScreen.prototype = Object.create(THREE.Mesh.prototype);
 TVScreen.prototype.constructor = TVScreen;
 
 TVScreen.prototype.customInit = function(){
-    //if(Math.random() ) 0.5
     var randomNumber = 3 * this.row + this.col; //parseInt(constants.aboutPage.type.length * Math.random());
     this.custom1Texture = window.app.assets.texture[constants.aboutPage.type[randomNumber]];
 };
@@ -95,15 +94,18 @@ TVScreen.prototype.update = function(dt){
     this.tvMaterial.uniforms.uTime.value += dt;
 };
 
-TVScreen.prototype.drawCanvas = function(){
-    this.ctx.fillStyle = constants.red;
+TVScreen.prototype.drawCanvas = function(isWhite){
+    this.ctx.fillStyle = isWhite? constants.white : constants.red;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
+    this.canvasTexture.needsUpdate = true;
 };
 
 TVScreen.prototype.startTransition = function(){
+    this.drawCanvas();
     TweenMax.to(this.tvMaterial.uniforms.uState, 1., {value: 1, onComplete: function(){
         this.isTweenComplete = true;
+        this.dispatchEvent({type: "mouseEnable"});
     }.bind(this) });
 }
 
@@ -118,6 +120,13 @@ TVScreen.prototype.onMouserOut = function(){
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.tvMaterial.uniforms.uState, 0.8, {value: 1, ease: Power2.easeOut });
 }
+
+TVScreen.prototype.backToHome = function(){
+    this.drawCanvas(true);
+    this.isTweenComplete = true;
+    if(this.tl) this.tl.pause();
+    this.tl = TweenMax.to(this.tvMaterial.uniforms.uState, 0.4, {value: 0, ease: Power2.easeOut });
+};
 
 
 module.exports = TVScreen;

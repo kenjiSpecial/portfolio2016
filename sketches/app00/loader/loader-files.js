@@ -13,5 +13,20 @@ module.exports = {
         {name: 'live', directory: './assets/live.jpg'},
         {name: 'japan', directory: './assets/japan.jpg'},
         {name: 'skills', directory: './assets/skills.jpg'},
+        {name: 'leftArrow', directory: './assets/left-arrow.jpg'},
+        {name: 'thumbnailXFile',            directory: './assets/works/thumbnail/x-file.jpg'},
+        {name: 'thumbnailCapitolCouture',   directory: './assets/works/thumbnail/capitol-couture.jpg'},
+        {name: 'thumbnailStrokeForLove',    directory: './assets/works/thumbnail/stroke-for-love.jpg'},
+        {name: 'thumbnailMinorityReport',   directory: './assets/works/thumbnail/minority-report.jpg'},
+        {name: 'thumbnailKoheiNawa',        directory: './assets/works/thumbnail/kohei-nawa.jpg'},
+        {name: 'thumbnailHug',              directory: './assets/works/thumbnail/hug.jpg'},
+        {name: 'thumbnailMucca',            directory: './assets/works/thumbnail/mucca.jpg'},
+        {name: 'thumbnailMlp',              directory: './assets/works/thumbnail/mlp.jpg'},
+        {name: 'thumbnailMore',             directory: './assets/works/thumbnail/more.jpg'},
+    ],
+    json : [
+        {name : "workData" , directory : './assets/json/works.json'}
     ]
+
+
 };

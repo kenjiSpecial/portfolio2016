@@ -1,5 +1,6 @@
 var TVScreen = require('./tv-screen');
 var TVAboutScreen = require('./tv-about-screen');
+var TVWorksScreen = require('./tv-works-screen');
 var appStore = require('../stores/app-store');
 var appAction = require('../actions/app-action');
 var _ = require('underscore');
@@ -7,9 +8,12 @@ var constants = require('../utils/constants');
 
 var HomeModel  = require('./model/home-model');
 var AboutModel = require('./model/about-model');
+var WorksModel = require('./model/works-model');
+var WorkModel  = require('./model/work-model');
 
 var TVObject = function( opts, tvScreen ){
-    _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onClickHandler', 'onTransitionStart', 'onChangeDirectory');
+    _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onClickHandler', 'onTransitionStart', 'onChangeDirectory', 'onMouseEnable', 'onMouseDisable');
+    //_.bindAll(this, );
 
     THREE.Object3D.call( this );
 
@@ -30,8 +34,11 @@ var TVObject = function( opts, tvScreen ){
     this.tvControllerMesh.position.set( 23, -28, 37 );
     this.add(this.tvControllerMesh);
 
-    this.homeModel = new HomeModel(this.row, this.col);
+    this.homeModel  = new HomeModel(this.row, this.col);
     this.aboutModel = new AboutModel(this.row, this.col);
+    this.worksModel = new WorksModel(this.row, this.col);
+    this.workModel  = new WorkModel(this.row, this.col);
+
 
     var sphere = new THREE.SphereGeometry(1, 1);
     this.glowMat = new THREE.MeshBasicMaterial({color: 0xcc1111});
@@ -41,8 +48,17 @@ var TVObject = function( opts, tvScreen ){
 
     if(tvScreen) this.tvScreen = tvScreen
     else this.tvScreen = new TVScreen( null, opts, this.row, this.col );
+    this.tvScreen.addEventListener('mouseEnable',  this.onMouseEnable   );
+    this.tvScreen.addEventListener('mouseDisable', this.onMouseDisable );
 
     this.aboutTvScreen = new TVAboutScreen( this.row, this.col );
+    this.aboutTvScreen.addEventListener('mouseEnable',  this.onMouseEnable   );
+    this.aboutTvScreen.addEventListener('mouseDisable', this.onMouseDisable );
+
+    this.worksTvScreen = new TVWorksScreen( this.row, this.col, this.worksModel );
+    this.worksTvScreen.addEventListener('mouseEnable',  this.onMouseEnable   );
+    this.worksTvScreen.addEventListener('mouseDisable', this.onMouseDisable );
+
 
     var cubeGeo = new THREE.CubeGeometry( 75, 75, 75);
     var cubeMat = new THREE.MeshBasicMaterial({color:0x000000, opacity: 0.01, transparent: true});
@@ -56,9 +72,8 @@ var TVObject = function( opts, tvScreen ){
     this.position.set( constants.tvPosition.x * (this.col - 1), constants.tvPosition.y * (-this.row + 1), 0 )
 
     this.add(this.tvScreen);
-    //this.add(this.aboutTvScreen);
 
-    this.setRouter();
+    this.goToHomeInit();
 
 };
 
@@ -70,7 +85,8 @@ TVObject.prototype.onChangeDirectory = function(){
 };
 
 TVObject.prototype.setRouter = function(){
-    //this.removeChild();
+    this.onMouseDisable();
+
 
     switch (appStore.curDirectory){
         case 'home':
@@ -79,6 +95,9 @@ TVObject.prototype.setRouter = function(){
         case 'about':
             this.goToAbout();
             break;
+        case 'works':
+            this.goToWorks();
+            break;
     }
 };
 
@@ -86,15 +105,39 @@ TVObject.prototype.removeChild = function(){
     if(this.tvScreen.parent) this.remove(this.tvScreen);
 };
 
-TVObject.prototype.goToHome = function(){
+TVObject.prototype.goToHomeInit = function(){
+    //console.log('gotohome');
     this.curModel = this.homeModel;
     this.homeModel.reset();
 
-    this.tvScreen.material.visible = true;
     setTimeout(this.turnOn.bind(this), constants.delay.firstDelay + constants.delay.intervalDelay * ( this.col) );
     this.rayCaster.material.color = constants[this.tag].lightColor; //new THREE.Color(0xff3333);
     this.turnOnColor = constants[this.tag].lightColor;
 };
+
+TVObject.prototype.goToHome = function(){
+    this.curModel = this.homeModel;
+    this.homeModel.reset();
+
+    if(appStore.prevDirectory == "about"){
+        this.aboutTvScreen.backToHome();
+    }else if(appStore.prevDirectory == 'works'){
+        this.worksTvScreen.backToHome();
+    }
+
+    setTimeout(function(){
+        if(appStore.prevDirectory == 'about') this.remove(this.aboutTvScreen);
+        if(appStore.prevDirectory == 'works') this.remove(this.worksTvScreen);
+
+        this.add(this.tvScreen);
+        this.tvScreen.resetHome();
+    }.bind(this), 400);
+
+    this.turnOnColor = constants[this.tag].lightColor;
+    this.glowMat.color = this.turnOnColor;
+    this.rayCaster.material.color = this.turnOnColor;
+
+}
 
 TVObject.prototype.goToAbout = function(){
     this.curModel = this.aboutModel;
@@ -107,16 +150,32 @@ TVObject.prototype.goToAbout = function(){
         this.add(this.aboutTvScreen);
 
         this.aboutTvScreen.startTransition();
-        TweenMax.to(this.rayCaster.material, 0.4, {opacity: 0.01, onComplete: function(){
-            appAction.mouseDiable();
-        }})
-    }.bind(this), 1500 + 300 + 300 * this.col );
+        TweenMax.to(this.rayCaster.material, 0.4, {opacity: 0.01});
+    }.bind(this), 1200 +  150 * this.col );
 
+};
+
+TVObject.prototype.goToWorks = function(){
+    //console.log('goToWorks');
+    this.curModel = this.workModel;
+    this.workModel.reset();
+
+    this.onTransitionStart();
+
+
+    setTimeout(function(){
+        this.remove(this.tvScreen);
+        this.add(this.worksTvScreen);
+
+        this.worksTvScreen.startTransition();
+        TweenMax.to(this.rayCaster.material, 0.4, {opacity: 0.01});
+    }.bind(this), 1200 +  150 * this.col );
 };
 
 TVObject.prototype.update = function(dt){
     if(this.tvScreen.parent) this.tvScreen.update(dt);
     if(this.aboutTvScreen.parent) this.aboutTvScreen.update(dt);
+    if(this.worksTvScreen.parent) this.worksTvScreen.update(dt);
 };
 
 TVObject.prototype.turnOn = function(){
@@ -158,10 +217,15 @@ TVObject.prototype.onMouseOver = function(){
 
     if(appStore.curDirectory == 'home') window.addEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOverAbout();
+    else if(appStore.curDirectory == 'works') this.onMouseOverWorks();
 };
 
 TVObject.prototype.onMouseOverAbout = function(){
     this.aboutTvScreen.onMouserOver();
+};
+
+TVObject.prototype.onMouseOverWorks = function(){
+    this.worksTvScreen.onMouserOver();
 };
 
 TVObject.prototype.onMouseOut = function(){
@@ -172,7 +236,7 @@ TVObject.prototype.onMouseOut = function(){
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
     if(appStore.curDirectory == 'home') window.removeEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOutAbout();
-
+    else if(appStore.curDirectory == 'works') this.onMouseOutWorks();
 };
 
 TVObject.prototype.onMouseOverType = function(){
@@ -185,6 +249,10 @@ TVObject.prototype.onMouseOutType = function(){
 
 TVObject.prototype.onMouseOutAbout = function(){
     this.aboutTvScreen.onMouserOut();
+}
+
+TVObject.prototype.onMouseOutWorks = function(){
+    this.worksTvScreen.onMouserOut();
 }
 
 TVObject.prototype.onClickHandler = function(){
@@ -212,5 +280,12 @@ TVObject.prototype.transToNextStage = function(){
     this.tvScreen.transToNextStage();
 }
 
+TVObject.prototype.onMouseEnable = function(){
+    this.rayCaster.mouseEnable = true;
+};
+
+TVObject.prototype.onMouseDisable = function(){
+    this.rayCaster.mouseEnable = false;
+};
 
 module.exports = TVObject;

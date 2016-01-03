@@ -2,8 +2,8 @@ var TVScreen = require('./tv-screen');
 var appStore = require('../stores/app-store');
 var _ = require('underscore')
 
-var TVObject = function( opts, noiseTexture ){
-    _.bindAll(this, 'onMainMouseOverObjectUpdated');
+var TVObject = function( opts ){
+    _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onMouseEnable', 'onMouseDisable');
     THREE.Object3D.call( this );
     //console.log(noiseTexture);
 
@@ -27,16 +27,16 @@ var TVObject = function( opts, noiseTexture ){
     lightMesh.position.set( -23 , -28, 39 );
     this.add(lightMesh)
 
-    this.tvScreen = new TVScreen(noiseTexture);
+    this.tvScreen = new TVScreen();
     this.add(this.tvScreen)
-
-
 
     var cubeGeo = new THREE.CubeGeometry( 75, 75, 75);
     var cubeMat = new THREE.MeshBasicMaterial({color:0x999999, opacity: 0.01, transparent: true});
     this.rayCaster = new THREE.Mesh(cubeGeo, cubeMat);
     this.add(this.rayCaster);
 
+    this.tvScreen.addEventListener('mouseEnable', this.onMouseEnable);
+    this.tvScreen.addEventListener('mouseDisable', this.onMouseDisable);
     appStore.addEventListener( appStore.MAIN_MOUSE_OVER_OBJECT_UPDATED, this.onMainMouseOverObjectUpdated );
 
     setTimeout(this.turnOn.bind(this), 500);
@@ -78,6 +78,14 @@ TVObject.prototype.turnOn = function(){
         this.glowMat.color = new THREE.Color(0x333333);
     }.bind(this), 1000);
     this.tvScreen.turnOn();
+}
+
+TVObject.prototype.onMouseEnable = function(){
+    this.rayCaster.mouseEnable = true;
+};
+
+TVObject.prototype.onMouseDisable = function(){
+    this.rayCaster.mouseEnable = false;
 }
 
 module.exports = TVObject;

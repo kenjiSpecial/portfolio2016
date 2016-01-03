@@ -3,8 +3,8 @@ var CanvasRenderer = require('fontpath-canvas');
 var RobotFont = require('../utils/fonts/robot-font');
 var _ = require('underscore');
 
-var TVScreen = function(noiseTexture){
-    _.bindAll(this, 'onCompleteTw0', 'onBlink');
+var TVScreen = function(){
+    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onCompleteTw1');
 
     this.canvasWidth = 620;
     this.canvasHeight = 540;
@@ -17,7 +17,6 @@ var TVScreen = function(noiseTexture){
     this.portfolioCanvas.width = this.canvasWidth;
     this.portfolioCanvas.height = this.canvasHeight;
     this.portfolioCtx = this.portfolioCanvas.getContext('2d');
-
 
     this.tvPlane = new THREE.PlaneGeometry( 62, 54);
 
@@ -41,7 +40,7 @@ var TVScreen = function(noiseTexture){
     this.tvMaterial = new THREE.ShaderMaterial({
         uniforms       : this.uniforms,
         vertexShader   : glslify('./shaders/common.vert'),
-        fragmentShader : glslify('./shaders/screen0/shader.frag')        ,
+        fragmentShader : glslify('./shaders/screen0/shader.frag'),
         side           : THREE.DoubleSide,
         transparent    : true
     });
@@ -104,7 +103,7 @@ TVScreen.prototype.turnOn = function(){
     tl.to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.1, ease: Quint.easeIn })
        .to(this.tvMaterial.uniforms.uState, 0.1, {value: 0.2})
         .to(this.tvMaterial.uniforms.uState, 0.3, {value: 0.4, onComplete: this.onCompleteTw0 })
-        .to(this.tvMaterial.uniforms.uState, 0.6, {value: 1.0, delay: 0.4});
+        .to(this.tvMaterial.uniforms.uState, 0.6, {value: 1.0, delay: 0.4, onComplete: this.onCompleteTw1 });
 
 };
 
@@ -114,6 +113,10 @@ TVScreen.prototype.onCompleteTw0 = function(){
     this.count = 0;
     setTimeout(this.onBlink, 60);
 }
+
+TVScreen.prototype.onCompleteTw1 = function(){
+    this.dispatchEvent({type: "mouseEnable"});
+};
 
 TVScreen.prototype.onBlink = function(){
     if(this.count % 2 == 0){

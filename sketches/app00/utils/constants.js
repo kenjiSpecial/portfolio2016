@@ -4,7 +4,7 @@ var canvasHeight = 540;
 module.exports = {
     white: '#ffffff',
     red: '#ff6666',
-    yellow: '#dddd33',
+    yellow: '#f1c30d',
     green: '#33ee33',
     tvScreen: {width: canvasWidth, height: canvasHeight},
     about: {
@@ -17,8 +17,8 @@ module.exports = {
         ]
     },
     works : {
-        "lightColor" : new THREE.Color(0xaaaa33),
-        "color" : "#dddd33",
+        "lightColor" : new THREE.Color(0xb7940a),
+        "color" : "#f1c30d",
         "position" : [
             {'left': 220},
             {'left': 180 - canvasWidth},

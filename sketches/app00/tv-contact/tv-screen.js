@@ -102,7 +102,7 @@ TVScreen.prototype.turnOn = function(){
 };
 
 TVScreen.prototype.onTurnOnComplete = function(){
-    setTimeout(function(){appAction.mouseEnable();}, 300);
+    this.dispatchEvent({type: "mouseEnable"});
 }
 
 TVScreen.prototype.onCompleteTw0 = function(){
@@ -154,6 +154,13 @@ TVScreen.prototype.onMouseOverTweenUpdate = function(){
     this.canvasTexture.needsUpdate = true;
 };
 
+TVScreen.prototype.onTransitionHomeStart = function(){
+    var tl = new TimelineMax();
+    tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, delay: 0.1 })
+        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 1, delay: 0.1, onComplete: this.onTurnOnComplete});
+
+};
+
 TVScreen.prototype.onTransitionStart = function(){
     this.transCanvasRenderer.text = appStore.curDirectory.toUpperCase();
     var bounds = this.transCanvasRenderer.getBounds();
@@ -170,7 +177,7 @@ TVScreen.prototype.onTransitionStart = function(){
 
     var tl = new TimelineMax();
     tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, delay: 0.1 })
-        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 3, delay: 0.5});
+        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 3, delay: 0.5, onComplete: this.onTurnOnComplete});
 }
 
 

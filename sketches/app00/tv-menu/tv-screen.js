@@ -6,7 +6,9 @@ var constants = require('../utils/constants');
 var appStore = require('../stores/app-store');
 
 var TVScreen = function(fragmentShader, textData, row, col){
-    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onStartAnimation', 'onUpdate', 'onMouseOverTweenUpdate', 'onMouseOverComplete', 'onTransToUpdate', 'onTransToUpdate2', 'transEndStart');
+    _.bindAll( this, 'onCompleteTw0', 'onBlink', 'onStartAnimation', 'onUpdate', 'onMouseOverTweenUpdate', 'onMouseOverComplete', 'onTransToUpdate', 'onTransToUpdate2', 'transEndStart');
+    _.bindAll( this, 'onCompleteTw1' );
+
     this.textDelay = 0.4;
     this.rate = 0;
     this.translAboutRate = 0;
@@ -77,6 +79,16 @@ var TVScreen = function(fragmentShader, textData, row, col){
 TVScreen.prototype = Object.create(THREE.Mesh.prototype);
 TVScreen.prototype.constructor = TVScreen;
 
+TVScreen.prototype.resetHome = function(){
+    this.rate = 0;
+    this.drawCanvas();
+    this.canvasTexture.needsUpdate = true;
+    this.tvMaterial.uniforms.uState.value = 0.4;
+    var tl = new TimelineMax();
+    tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 1.0, onUpdate: this.onUpdate, delay: this.col * 0.1, onComplete: this.onCompleteTw1 });
+
+};
+
 TVScreen.prototype.update = function(dt){
     this.tvMaterial.uniforms.uTime.value += dt;
 };
@@ -97,26 +109,10 @@ TVScreen.prototype.turnOn = function(){
     tl.to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.1, ease: Quint.easeIn })
         .to(this.tvMaterial.uniforms.uState, 0.1, {value: 0.2})
         .to(this.tvMaterial.uniforms.uState, 0.3, {value: 0.4, onComplete: this.onCompleteTw0 })
-        .to(this.tvMaterial.uniforms.uState, this.customDuration, {value: 1.0, onUpdate: this.onUpdate, delay: this.customDelay});
+        .to(this.tvMaterial.uniforms.uState, this.customDuration, {value: 1.0, onUpdate: this.onUpdate, delay: this.customDelay, onComplete: this.onCompleteTw1 });
 };
 
-TVScreen.prototype.onUpdate = function(){
-
-    /**
-    var rate = (this.tvMaterial.uniforms.uState.value - 0.4) / 0.6;
-    this.ctx.fillStyle = constants.white;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.save();
-
-    this.ctx.save();
-    //var randomType = constants.types[parseInt(constants.types.length * Math.random())];
-    this.ctx.fillStyle = constants[this.tag].color;
-    //this.ctx.globalAlpha = rate;
-    this.canvasRenderer.fill( this.ctx, constants[this.tag].position[this.col].left , 450)
-    this.ctx.restore();
-
-    this.canvasTexture.needsUpdate = true; */
-};
+TVScreen.prototype.onUpdate = function(){};
 
 TVScreen.prototype.onCompleteTw0 = function(){
     return;
@@ -127,6 +123,10 @@ TVScreen.prototype.onCompleteTw0 = function(){
 
     setTimeout(this.onBlink, 60);
 }
+
+TVScreen.prototype.onCompleteTw1 = function(){
+    this.dispatchEvent({type: "mouseEnable"});
+};
 
 TVScreen.prototype.onStartAnimation = function(){
 
@@ -144,15 +144,11 @@ TVScreen.prototype.onBlink = function(){
 }
 
 TVScreen.prototype.onMouseOverType = function(){
-    if(appStore.curDirectory != 'home') return;
-
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this, 0.6, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
 };
 
 TVScreen.prototype.onMouseOutType = function(){
-    if(appStore.curDirectory != 'home') return;
-
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this, 0.6, {rate: 0, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
 };

@@ -2,6 +2,8 @@ THREE.Cache.enabled = true;
 var loaderFiles = require('./loader-files');
 var _ = require('underscore');
 
+var jsonLoadFunction = require('../utils/functions').loadJSON;
+
 function load(url, onLoad, name){
     var scope = this;
 
@@ -40,7 +42,7 @@ function load(url, onLoad, name){
 }
 
 var Loader = function() {
-    _.bindAll(this, 'onLoadModel', 'onLoadImage');
+    _.bindAll(this, 'onLoadModel', 'onLoadImage', 'onLoadJson');
 
     this.ASSETS_LOADED = 'assetsLoaded';
 
@@ -57,6 +59,7 @@ THREE.EventDispatcher.prototype.apply( Loader.prototype );
 Loader.prototype.start = function(){
     var modelFiles = loaderFiles.models;
     var imageFiles = loaderFiles.images;
+    var jsonFiles  = loaderFiles.json;
 
     modelFiles.forEach(function(modelFile){
         var jsonFileUrl  = modelFile.directory;
@@ -74,6 +77,15 @@ Loader.prototype.start = function(){
         this.fileLength++;
     }.bind(this));
 
+    jsonFiles.forEach(function(jsonFile){
+        var jsonName = jsonFile.name;
+        var jsonUrl  = jsonFile.directory;
+
+        jsonLoadFunction(this.onLoadJson, jsonUrl, jsonName);
+
+        this.fileLength++;
+    }.bind(this));
+
 
 };
 
@@ -85,11 +97,21 @@ Loader.prototype.onLoadModel = function(geometry, materials, name){
     window.app.assets.model[name] = {geometry: geometry, material: materials[0]};
 
     this.fileCount++;
+    //console.log(this.fileCount + "/" + this.fileLength);
     if(this.fileCount == this.fileLength) this.loaded();
 };
 
 Loader.prototype.onLoadImage = function(image){
     this.fileCount++;
+    //console.log(this.fileCount + "/" + this.fileLength);
+    if(this.fileCount == this.fileLength) this.loaded();
+};
+
+Loader.prototype.onLoadJson = function(response, fileName){
+    var dataJson = JSON.parse(response);
+    window.app.assets.json[fileName] = dataJson;
+    this.fileCount++;
+    //console.log(this.fileCount + "/" + this.fileLength);
     if(this.fileCount == this.fileLength) this.loaded();
 };
 

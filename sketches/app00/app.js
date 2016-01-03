@@ -4,10 +4,13 @@ require('./utils/ShaderExtras');
 
 var customRayCaster = require('./custom-raycaster/custom-raycaster');
 var keydown = require('keydown');
-var TVMenuScene = require('./tv-menu-scene');
-var TVMainScene = require('./tv-main-scene');
-var TVContactScene = require('./tv-contact-scene');
-var CustomLoader = require('./loader/loader');
+
+var TVMenuScene      = require('./tv-menu-scene');
+var TVMainScene      = require('./tv-main-scene');
+var TVIndicatorScene = require('./tv-indicator-scene')
+var TVContactScene   = require('./tv-contact-scene');
+
+var CustomLoader     = require('./loader/loader');
 
 var raf = require('raf');
 var scene = new THREE.Scene();
@@ -15,14 +18,15 @@ var glowscene = new THREE.Scene();
 var controls, renderer;
 var camera;
 
-var tvMenuScene, tvMainScene, tvContactScene;
+var tvMenuScene, tvMainScene, tvContactScene, tvIndicatorScene;
 var clock;
 var renderTargetGlow, renderTarget;
 
 window.app = {
     assets : {
-        model : {},
-        texture : {}
+        model   : {},
+        texture : {},
+        json    : {}
     }
 };
 
@@ -67,7 +71,8 @@ function init() {
     tvContactScene = new TVContactScene();
     scene.add(tvContactScene);
 
-
+    //tvIndicatorScene = new TVIndicatorScene();
+    //scene.add(tvIndicatorScene);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, .15);
     directionalLight.position.set( 0, 100, 120);
@@ -203,6 +208,7 @@ function loop() {
     tvMenuScene.update(dt);
     tvMainScene.update(dt);
     tvContactScene.update(dt);
+    //tvIndicatorScene.update(dt);
     renderer.render(scene, camera);
     //glowcomposer.render();
     //finalcomposer.render();
