@@ -103,6 +103,13 @@ TVObject.prototype.onMouseOut = function(){
 TVObject.prototype.onTransitionStart = function(){
     this.onMouseDisable();
 
+    if(appStore.prevDirectory == 'work'){
+        this.tvScreen.backToWorks();
+        this.turnOnColor = constants[appStore.curDirectory].lightColor;
+        this.glowMat.color = this.turnOnColor;
+        return;
+    }
+
     if(appStore.curDirectory == 'home'){
         this.curModel.clickable = true;
 
@@ -111,7 +118,7 @@ TVObject.prototype.onTransitionStart = function(){
             this.glowMat.color = this.contactColor;
         }.bind(this), 500);
         this.tvScreen.onTransitionHomeStart();
-    }else{
+    }else if(appStore.curDirectory == 'works' || appStore.curDirectory == 'about' || appStore.curDirectory == 'sketch' || appStore.curDirectory == 'contact' ){
         this.curModel.clickable = false;
 
         this.tvScreen.onTransitionStart();
@@ -122,9 +129,14 @@ TVObject.prototype.onTransitionStart = function(){
         }.bind(this), 1000);
 
 
-        this.rayCaster.material.color = appStore.selectedObject.rayCaster.material.color;
+        this.rayCaster.material.color = constants[appStore.curDirectory].lightColor;
         this.tl = TweenMax.to(this.rayCaster.material, 1.0, {opacity: 0.3, ease: Quint.easeInOut, delay: 0.6});
-        this.tl = TweenMax.to(this.rayCaster.material, 1.0, {opacity: 0.01, ease: Quint.easeInOut, delay: 0.6 + 1.1});
+        this.tl = TweenMax.to(this.rayCaster.material, 1.0, {opacity: 0.01, ease: Quint.easeInOut, delay: 0.6 + 0.8 });
+    }else{
+        this.turnOnColor = constants.turnOffColor;
+        this.glowMat.color = constants.turnOffColor;
+
+        this.tvScreen.shutDown();
     }
 
 };

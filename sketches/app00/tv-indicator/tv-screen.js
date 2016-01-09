@@ -83,12 +83,15 @@ TVScreen.prototype.onBlink = function(){
 }
 
 TVScreen.prototype.onMouseOver = function(){
+    if(this.isClick) return;
 
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, ease: Power4.easeOut})
 };
 
 TVScreen.prototype.onMouseOut = function(){
+    if(this.isClick) return;
+
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this.tvMaterial.uniforms.uState, 0.4, {value: 1, ease: Power4.easeOut})
 }
@@ -97,7 +100,13 @@ TVScreen.prototype.onMouseOverTweenUpdate = function(){
 
 };
 
+TVScreen.prototype.onClick = function(){
+    var tl = new TimelineMax();
+    this.isClick = true;
+    tl.to(this.tvMaterial.uniforms.uState, 0.1, {value: 3.0 })
+        .to(this.tvMaterial.uniforms.uState, 0.1, {value: 2.0, onComplete: function(){this.isClick = false; }.bind(this) });
 
+};
 
 module.exports = TVScreen;
 

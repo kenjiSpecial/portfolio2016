@@ -102,6 +102,50 @@ void main(){
 
 
             gl_FragColor = vec4( colR, colG, colB, 1.);
+        }else if(uState < 4.0){
+            float tRate = 4.0 - uState;
+            if(tRate <= 0.1){
+                float lineHeight = 0.5;
+                rate = tRate/0.1;
+                float xRate = abs(vUv.x - 0.5)/0.5;
+
+                if(xRate < rate && vUv.y > 0.5-lineHeight/sideHeight && vUv.y < 0.5+lineHeight/sideHeight ){
+                    float nRate = abs(vUv.y - 0.5)/(lineHeight/sideHeight);
+                    n = clamp(0.04 + 1.2-1.2 * nRate, 0.04, 0.9);
+                }else{
+                    n = 0.04;
+                }
+                gl_FragColor = vec4(n, n, n, 1.0 );
+            }else if(tRate <= 0.2){
+                float lineHeight = 0.5 + 32. * (tRate - 0.1)/0.1;
+                float nRate = abs(vUv.y - 0.5)/(lineHeight/sideHeight);
+                n = clamp(0.04 + 1.2-1.2 * nRate, 0.04, 0.9);
+                gl_FragColor = vec4(n, n, n, 1.0 );
+            }else if(tRate <= 0.4){
+                float lineHeight = 0.5 + 32.;
+                float nRate = abs(vUv.y - 0.5)/(lineHeight/sideHeight);
+                float WhiteVal = clamp(0.04 + 1.2-1.2 * nRate, 0.04, 0.9);
+                float curRate = (tRate - 0.2)/0.2;
+                n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)) ) * curRate + WhiteVal * (1.-curRate);
+                gl_FragColor = vec4(n, n, n, 1.0 );
+            }else{
+                float xPos;
+                float rate = (tRate - 0.4) / (1.0 - 0.4);
+                if(vUv.x > rate) xPos = rate;
+                else             xPos = vUv.x;
+
+                vec4 texel = texture2D( transformTexture, vec2( xPos, vUv.y ));
+                n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
+                float colR, colG, colB;
+                colR = (texel.r * n);
+                colG = (texel.g * n);
+                colB = (texel.b * n);
+
+                gl_FragColor = vec4( colR, colG, colB, 1.);
+            }
+
+        }else if(uState == 4.0){
+            gl_FragColor = vec4( 0., 0., 0., 1.);
         }
 
     }else{

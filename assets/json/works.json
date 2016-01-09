@@ -1,38 +1,112 @@
 [
   {
+    "id"        : "xFiles",
     "title"     : "The X Files",
-    "thumbnail" : "thumbnailXFile"
+    "thumbnail" : "thumbnailXFile",
+    "main"      : "mainXFile",
+    "year"      : "2016",
+    "role"      : "WebGL",
+    "company"   : "Watson/DG",
+    "technology": "three.js, GLSL, JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url"       : "http://www.fox.com/the-x-files"
   },
   {
+    "id"        : "capitolCouture",
     "title"     : "Capitol Couture",
-    "thumbnail" : "thumbnailCapitolCouture"
+    "thumbnail" : "thumbnailCapitolCouture",
+    "main"      : "mainCapitolCouture",
+    "year"      : "2015",
+    "role"      : "WebGL",
+    "company"   : "Watson/DG",
+    "technology": "three.js, GLSL, JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url"       : "http://capitolcouture.pn/"
   },
   {
+    "id"        : "strokeForLove",
     "title"     : "Stroke For Love",
-    "thumbnail" : "thumbnailStrokeForLove"
+    "thumbnail" : "thumbnailStrokeForLove",
+    "main"      : "mainStrokeForLove",
+    "year"      : "2015",
+    "role"      : "WebGL",
+    "company"   : "Watson/DG",
+    "technology": "WebGL, GLSL, JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url"       : "http://strokefor.love/"
   },
   {
+    "id"        : "minorityReport",
     "title"     : "Minority Report",
-    "thumbnail" : "thumbnailMinorityReport"
+    "thumbnail" : "thumbnailMinorityReport",
+    "main"      : "mainMinorityReport",
+    "year"      : "2015",
+    "role"      : "front-end",
+    "company"   : "Watson/DG",
+    "technology": "JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url" : "https://www.richmediagallery.com/detailPage?id=10733"
   },
   {
+    "id"        : "koheiNawa",
     "title"     : "Kohei Nawa Website",
-    "thumbnail" : "thumbnailKoheiNawa"
+    "thumbnail" : "thumbnailKoheiNawa",
+    "main"      : "mainKoheiNawa",
+    "year"      : "2015",
+    "role"      : "front-end",
+    "company"   : "Tha",
+    "technology": "JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url" : "http://kohei-nawa.net/"
   },
   {
+    "id"        : "hugVision",
     "title"     : "Hug Vision",
-    "thumbnail" : "thumbnailHug"
+    "thumbnail" : "thumbnailHug",
+    "main"      : "mainHug",
+    "year"      : "2015",
+    "role"      : "Develop",
+    "company"   : "Tha",
+    "technology": "openFrameworks",
+    "visitType" : "VIEW",
+    "visit"     : false,
+    "url" : ""
   },
   {
+    "id"        : "muccaApproach",
     "title"     : "Mucca Approach",
-    "thumbnail" : "thumbnailMucca"
+    "thumbnail" : "thumbnailMucca",
+    "main"      : "mainMucca",
+    "year"      : "2014",
+    "role"      : "front-end",
+    "company"   : "Freelance",
+    "technology": "JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url"       : "http://mucca.com/approach/"
   },
   {
-    "title"     : "My Little Pony Game",
-    "thumbnail" : "thumbnailMlp"
+    "id"        : "myLittlePonyGame",
+    "title"     : "Pop PonyMaker Game",
+    "thumbnail" : "thumbnailMlp",
+    "main"      : "mainMlp",
+    "year"      : "2014",
+    "role"      : "Game Develop",
+    "company"   : "Freelance",
+    "technology": "JavaScript",
+    "visitType" : "LAUNCH",
+    "visit"     : true,
+    "url"       : "http://mylittlepony.hasbro.com/en-us/media/pop-ponymaker-game:FBFFD8BC-5056-9047-F5E4-EEA15154EE35"
   },
   {
+    "id"        : "more",
     "title"     : "more",
-    "thumbnail" : "thumbnailMore"
+    "thumbnail" : "thumbnailMore",
+    "url"       : "http://archive.kenji-special.info"
   }
 ]

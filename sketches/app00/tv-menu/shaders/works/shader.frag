@@ -2,6 +2,7 @@ uniform float uTime;
 uniform float uState;
 uniform sampler2D texture;
 uniform sampler2D texture1;
+uniform sampler2D workTexture;
 
 varying vec2 vUv;
 
@@ -18,6 +19,7 @@ uniform float uRandom1;
 uniform float uRandom2;
 uniform float uColR;
 uniform float uColG;
+uniform float workType;
 
 float scanLineThickness = 25.;
 float scanLineIntensity = 0.5;
@@ -125,7 +127,7 @@ vec3 getColor(){
     offset = pow( offset*distortion1,3.0)/max(distortion1,0.001);
     offset += snoise2(vec2(yt*50.0,0.0))*distortion2*0.01;
     vec2 adjusted = vec2(fract(vUv.x + offset),fract(vUv.y- distance ) );
-    adjusted = floor(adjusted * 20.)/20.;
+    adjusted = floor(adjusted * 20. + 0.5 )/20.;
     if(adjusted.y > uRandom && adjusted.y  < uRandom + uRandom1){
         adjusted.x = mod(adjusted.x + uRandom2, 1.);
     }
@@ -136,6 +138,46 @@ vec3 getColor(){
             col.r *= uColR;
             col.g *= uColR;
     }
+    return col;
+}
+
+
+float h00(float x) { return 2.*x*x*x - 3.*x*x + 1.; }
+float h10(float x) { return x*x*x - 2.*x*x + x; }
+float h01(float x) { return 3.*x*x - 2.*x*x*x; }
+float h11(float x) { return x*x*x - x*x; }
+
+float Hermite(float p0, float p1, float m0, float m1, float x)
+{
+	return p0*h00(x) + m0*h10(x) + p1*h01(x) + m1*h11(x);
+}
+
+float terrain(float x) {
+    //Used Shadershop
+    //return ((sin( (sin( (x - -1.33) / 0.76 / 1.23 ) * 0.8 - 0.69) / 0.58 )) * (((((sin( (((x - -1.33) / 0.76 - -3.0) / 2.61 - -0.38) / 1.52 ) * 2.25) * (sin( (((x - -1.33) / 0.76 - -3.0) / 2.61 - -0.47) / 1.61 ) * 1.03))) * (sin( ((x - -1.33) / 0.76 - -3.0) / 2.61 / 0.44 ) * 1.48)) * 1.08)) * 0.78;
+	//You actually should look after sigma.
+    float v = 0.;
+    x *= 3.;
+    #define l 13.
+    for (float n = 0.; n < l; n++) {
+        v += ((sin((x*sin(n/2.142))+(n/1.41)))/l)*3.;
+    }
+    return pow(v,3.);
+}
+
+
+vec3 getNextCol(){
+    vec2 customUv;
+    if(workType < 6.){
+        float unit1 = 0.33333;
+        float unit2 = 0.5;
+        customUv.x = floor(mod(workType, 3.)) * unit1 + unit1 * vUv.x;
+        customUv.y = (1. - floor(workType/3.))* unit2 + unit2 * vUv.y;
+    }else{
+        customUv = vUv;
+    }
+
+    vec3 col = texture2D(workTexture, customUv).rgb;
     return col;
 }
 
@@ -179,25 +221,57 @@ void main(){
         n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
         vec3 col = texture2D(texture1, vUv).rgb;
         color = vec3( col * n);
-    }
-    /**
-    else if(uState < 2.){
-    n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
-        float rate = uState - 1.;
-        float inXPos = vUv.x + cos( vUv.y * 10. + uTime * 3. ) * 0.3 + 0.1 * sin(uTime * 3. + vUv.y * 3.14 * 6.);
-        float inYPos = ( cos(uTime * 0.6 + vUv.y * .3) + 1. ) /2.;
-        float xPos = mix(inXPos, vUv.x, rate);
-        float yPos = mix(inYPos, vUv.y, rate);
-
-        colR = texture2D( texture1, vec2( xPos, yPos )).r;
-        colG = texture2D( texture1, vec2( xPos + 0.1 * cos(uTime * 3.) * (1.-rate), yPos )).g;
-        colB = texture2D( texture1, vec2( xPos - 0.1 * cos(uTime * 1.) * (1.-rate), yPos )).b;
-
-        color = vec3( colR * n, colG * n, colB * n );
-    }else if(uState == 2.){
+    }else if(uState < 3.){
+        float rate = uState - 2.;
         n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
-        color = vec3(n * texture2D( texture1, vUv.xy ).rgb);
-    } */
+        vec3 col = texture2D(texture1, vUv).rgb * n;
+        vec3 nextCol = getNextCol() * (1. - n/3.);
+        color = mix(col, nextCol, rate);
+    }else if(uState == 3.){
+        n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
+        vec3 col = getNextCol() * (1. - n/3.);
+        color = vec3(col );
+    }else if(uState < 4.){
+        float rate = uState - 3.;
+        n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
+        //vec3 col = getNextCol() ));
+        vec2 uv = vec2(vUv.x, vUv.y);
+        float a = sin(uTime * 1.0)*0.5 + 0.5;
+        float b = sin(uTime * 0.5)*0.5 + 0.5;
+        float c = sin(uTime * 0.35)*0.5 + 0.5;
+        float d = sin(uTime * 1.5)*0.5 + 0.5;
+
+        float y0 = mix(a, b, uv.x);
+        float y1 = mix(c, d, uv.x);
+        float x0 = mix(a, c, uv.y);
+        float x1 = mix(b, d, uv.y);
+
+
+        uv.x = Hermite(0., 1., 3.*x0, 3.*x1, uv.x);
+        uv.y = Hermite(0., 1., 3.*y0, 3.*y1, uv.y);
+
+        vec2 uuV = mix(vUv, uv, rate);
+        vec3 col = texture2D(workTexture, uuV).rgb;
+        color = vec3(col * (1. - n/3. * (1.-rate) ));
+    }else if(uState == 4.){
+        float a = sin(uTime * 1.0)*0.5 + 0.5;
+        float b = sin(uTime * 0.5)*0.5 + 0.5;
+        float c = sin(uTime * 0.35)*0.5 + 0.5;
+        float d = sin(uTime * 1.5)*0.5 + 0.5;
+
+        vec2 uv = vec2(vUv.x, vUv.y);
+        float y0 = mix(a, b, uv.x);
+        float y1 = mix(c, d, uv.x);
+        float x0 = mix(a, c, uv.y);
+        float x1 = mix(b, d, uv.y);
+
+        uv.x = Hermite(0., 1., 3.*x0, 3.*x1, uv.x);
+        uv.y = Hermite(0., 1., 3.*y0, 3.*y1, uv.y);
+
+        vec3 col = texture2D(workTexture, uv).rgb;
+        color = vec3(col );
+    }
+
 
 
     gl_FragColor = vec4(color, 1.);

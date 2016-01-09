@@ -13,12 +13,13 @@ var WorkModel  = require('./model/work-model');
 
 var TVObject = function( opts, tvScreen ){
     _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onClickHandler', 'onTransitionStart', 'onChangeDirectory', 'onMouseEnable', 'onMouseDisable');
-    //_.bindAll(this, );
+    _.bindAll(this, 'onClickWorksHandler', 'onClickWorkHandler');
 
     THREE.Object3D.call( this );
 
     this.row = opts.row || 0;
     this.col = opts.col || 0;
+    this.idNumber = this.row * 3 + this.col;
     this.tag = constants.types[this.row];
 
     //console.log(window.app.assets.model.tvData.geometry.clone());
@@ -87,6 +88,16 @@ TVObject.prototype.onChangeDirectory = function(){
 TVObject.prototype.setRouter = function(){
     this.onMouseDisable();
 
+    //console.log(appStore.prevDirectory);
+    if(appStore.prevDirectory == 'works'){
+        this.worksTvScreen.stopTimer();
+    }
+
+    if(appStore.prevDirectory == 'work'){
+        this.goToWorksFromWork();
+        return;
+    }
+
 
     switch (appStore.curDirectory){
         case 'home':
@@ -97,6 +108,9 @@ TVObject.prototype.setRouter = function(){
             break;
         case 'works':
             this.goToWorks();
+            break;
+        case 'work':
+            this.goToWork();
             break;
     }
 };
@@ -155,13 +169,36 @@ TVObject.prototype.goToAbout = function(){
 
 };
 
-TVObject.prototype.goToWorks = function(){
-    //console.log('goToWorks');
+TVObject.prototype.goToWork = function(){
     this.curModel = this.workModel;
+    this.workModel.set(appStore.selectedObject);
+
+    this.worksTvScreen.transToWork(this.workModel);
+
+    this.turnOnColor = this.curModel.clickable ?  constants['work'].heightLightColor : constants['work'].lightColor;
+    this.glowMat.color = this.turnOnColor;
+    this.rayCaster.material.color = constants['work'].heightLightColor;
+    //console.log(constants['work'].lightColor);
+};
+
+TVObject.prototype.goToWorksFromWork = function(){
+    this.curModel = this.worksModel;
+
+    this.worksTvScreen.backToWorks();
+
+    setTimeout(function(){
+        this.turnOnColor = constants[appStore.curDirectory].lightColor;
+        this.glowMat.color = this.turnOnColor;
+
+        this.rayCaster.material.color = constants[appStore.curDirectory].lightColor;
+    }.bind(this), 300 + 300 * Math.random())
+};
+
+TVObject.prototype.goToWorks = function(){
+    this.curModel = this.worksModel;
     this.workModel.reset();
 
     this.onTransitionStart();
-
 
     setTimeout(function(){
         this.remove(this.tvScreen);
@@ -218,6 +255,7 @@ TVObject.prototype.onMouseOver = function(){
     if(appStore.curDirectory == 'home') window.addEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOverAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOverWorks();
+    else if(appStore.curDirectory == 'work')  this.onMouseOverWork();
 };
 
 TVObject.prototype.onMouseOverAbout = function(){
@@ -226,6 +264,17 @@ TVObject.prototype.onMouseOverAbout = function(){
 
 TVObject.prototype.onMouseOverWorks = function(){
     this.worksTvScreen.onMouserOver();
+
+    if(this.worksModel.clickable){
+        window.addEventListener('click', this.onClickWorksHandler );
+    }
+};
+
+TVObject.prototype.onMouseOverWork = function(){
+    if(this.workModel.clickable){
+        this.worksTvScreen.onWorkMouseOver();
+        window.addEventListener('click', this.onClickWorkHandler);
+    }
 };
 
 TVObject.prototype.onMouseOut = function(){
@@ -237,6 +286,7 @@ TVObject.prototype.onMouseOut = function(){
     if(appStore.curDirectory == 'home') window.removeEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOutAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOutWorks();
+    else if(appStore.curDirectory == 'work' ) this.onMouseOutWork();
 };
 
 TVObject.prototype.onMouseOverType = function(){
@@ -253,11 +303,49 @@ TVObject.prototype.onMouseOutAbout = function(){
 
 TVObject.prototype.onMouseOutWorks = function(){
     this.worksTvScreen.onMouserOut();
+    window.removeEventListener('click', this.onClickWorksHandler );
+};
+
+TVObject.prototype.onMouseOutWork = function(){
+    document.body.style.cursor = "default";
+    if(this.workModel.clickable){
+        this.worksTvScreen.onWorkMouseOut();
+        window.removeEventListener('click', this.onClickWorkHandler );
+    }
+
 }
 
 TVObject.prototype.onClickHandler = function(){
     appAction.clickObject(this);
     window.removeEventListener('click', this.onClickHandler );
+};
+
+TVObject.prototype.onClickWorksHandler = function(){
+    if(this.idNumber == 8){
+        var win = window.open(this.curModel.worksData.url, '_blank');
+        if(win){
+            win.focus();
+        }else{
+            //Broswer has blocked it
+            alert('Please allow popups for this site');
+        }
+    } else {
+        appAction.clickWorks(this.worksModel);
+    }
+    window.removeEventListener('click', this.onClickWorksHandler );
+};
+
+TVObject.prototype.onClickWorkHandler = function(){
+    document.body.style.cursor = "default";
+    var win = window.open(this.curModel.workData.url, '_blank');
+    if(win){
+        //Browser has allowed it to be opened
+        win.focus();
+    }else{
+        //Broswer has blocked it
+        alert('Please allow popups for this site');
+    }
+    window.removeEventListener('click', this.onClickWorkHandler );
 };
 
 TVObject.prototype.onTransitionStart = function(){

@@ -9,6 +9,7 @@ THREE.EventDispatcher.prototype.apply( AppAction.prototype );
 AppAction.prototype.MOUSE_OVER_OBJECT     = 'mouseOverObject';
 AppAction.prototype.MOUSE_OUT_OBJECT      = 'mouseOutObject';
 AppAction.prototype.GO_TO_HOME            = 'goToHome';
+AppAction.prototype.GO_TO_WORKS           = 'goToWorks';
 AppAction.prototype.CLICK_OBJECT          = 'clickObject';
 //AppAction.prototype.MOUSE_ENABLE          = 'mouseEnable';
 AppAction.prototype.MOUSE_DISABLE         = 'mouseDisable';
@@ -16,6 +17,7 @@ AppAction.prototype.MOUSE_OVER_ABOUT_TYPE = 'mouseOverAboutType';
 AppAction.prototype.MOUSE_OUT_ABOUT_TYPE  = 'mouseOutAboutType';
 AppAction.prototype.MOUSE_OVER_WORKS_TYPE = 'mouseOverWorksType';
 AppAction.prototype.MOUSE_OUT_WORKS_TYPE  = 'mouseOutWorksType';
+AppAction.prototype.CLICK_WORKS           = "clickWorks";
 
 AppAction.prototype.onMouseOverAboutType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_ABOUT_TYPE})
@@ -45,9 +47,17 @@ AppAction.prototype.clickObject = function(object){
     this.dispatchEvent({ type: this.CLICK_OBJECT, object: object });
 };
 
+AppAction.prototype.clickWorks = function(worksModel){
+    this.dispatchEvent({type: this.CLICK_WORKS, model: worksModel })
+}
+
 AppAction.prototype.goToHome = function(){
     this.dispatchEvent({ type: this.GO_TO_HOME });
 };
+
+AppAction.prototype.goToWorks = function(){
+    this.dispatchEvent({ type: this.GO_TO_WORKS });
+}
 //
 //AppAction.prototype.mouseEnable = function(){
 //    this.dispatchEvent({ type: this.MOUSE_ENABLE });

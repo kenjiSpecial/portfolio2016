@@ -34,6 +34,11 @@ module.exports = {
             {'left': 40 - canvasWidth * 2}
         ]
     },
+    work : {
+        "lightColor"       : new THREE.Color(0x333333),
+        "heightLightColor" : new THREE.Color(0x999999),
+    },
+    turnOffColor : new THREE.Color(0xcc1111),
     types : [
         "about",
         "works",

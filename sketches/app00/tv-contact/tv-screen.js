@@ -133,6 +133,16 @@ TVScreen.prototype.onMouseOut = function(){
     this.tw = TweenMax.to(this, 0.4, {rate: 0, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate})
 }
 
+TVScreen.prototype.shutDown = function(){
+    if(this.tw) this.tw.pause();
+    this.tw = TweenMax.to(this.tvMaterial.uniforms.uState, 0.4, {value: 4, ease: Power4.easeOut});
+};
+
+TVScreen.prototype.backToWorks = function(){
+    if(this.tw) this.tw.pause();
+    this.tw = TweenMax.to(this.tvMaterial.uniforms.uState, 1.2, {value: 3, onComplete: this.onTurnOnComplete} );
+};
+
 TVScreen.prototype.onMouseOverTweenUpdate = function(){
     this.ctx.fillStyle = '#ffffff';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

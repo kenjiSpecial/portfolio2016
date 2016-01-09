@@ -5,6 +5,7 @@ var AppStore = function(){
     _.bindAll(this, 'onMouseOverObject', 'onMouseOutObject', 'onClickObject');
     _.bindAll(this, 'onMouseOverAboutType', 'onMouseOutAboutType', 'onGoToHome');
     _.bindAll(this, 'onMouseOverWorksType', 'onMouseOutWorksType');
+    _.bindAll(this, 'onClickWorks', 'onGoToWorks');
 
     this._curDirectory         = 'home';
     this._mouseOverObject     = null;
@@ -18,6 +19,8 @@ var AppStore = function(){
     appAction.addEventListener(appAction.MOUSE_OVER_WORKS_TYPE, this.onMouseOverWorksType);
     appAction.addEventListener(appAction.MOUSE_OUT_WORKS_TYPE, this.onMouseOutWorksType);
     appAction.addEventListener(appAction.GO_TO_HOME, this.onGoToHome);
+    appAction.addEventListener(appAction.GO_TO_WORKS, this.onGoToWorks);
+    appAction.addEventListener(appAction.CLICK_WORKS, this.onClickWorks);
 }
 
 THREE.EventDispatcher.prototype.apply( AppStore.prototype );
@@ -35,7 +38,8 @@ AppStore.prototype.MOUSE_OUT_ABOUT_TYPE  = 'mouseOutAboutType';
 AppStore.prototype.MOUSE_OVER_WORKS_TYPE = 'mouseOverWorksType';
 AppStore.prototype.MOUSE_OUT_WORKS_TYPE  = 'mouseOutWorksType';
 AppStore.prototype.GO_TO_HOME            = 'goToHome';
-
+AppStore.prototype.GO_TO_WORKS           = 'goToWorks';
+AppStore.prototype.CLICK_WORKS           = "clickWorks";
 
 AppStore.prototype.onMouseOverWorksType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_WORKS_TYPE});
@@ -91,6 +95,25 @@ AppStore.prototype.onGoToHome = function(){
     //setTimeout(this.onMouseEnable.bind(this), 1000);
 }
 
+AppStore.prototype.onGoToWorks = function(){
+    console.log('onGoToWorks');
+    this.curDirectory = "works";
+    this.selectedObject = null;
+
+    document.body.style.cursor = "default";
+    this.mouseOverProject = null;
+    this.mainMouseOverObject = null;
+};
+
+AppStore.prototype.onClickWorks = function(ev){
+    this.curDirectory = 'work'; //ev.model.id;
+    this.selectedObject = ev.model;
+
+    document.body.style.cursor = "default";
+    this.mouseOverProject = null;
+    this.mainMouseOverObject = null;
+};
+
 AppStore.prototype.onMouseDisable = function(){
     document.body.style.cursor = "default";
 }
@@ -125,6 +148,7 @@ Object.defineProperty(AppStore.prototype, 'selectedObject', {
         this.isTransition = true;
     }
 });
+
 
 
 Object.defineProperty(AppStore.prototype, 'mouseOverProject', {
@@ -165,6 +189,8 @@ Object.defineProperty(AppStore.prototype, 'curDirectory', {
         }
     }
 });
+
+
 
 var appStore = new AppStore();
 

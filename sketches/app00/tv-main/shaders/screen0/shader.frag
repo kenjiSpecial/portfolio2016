@@ -151,30 +151,18 @@ void main(){
                 uv.x = Hermite(0., 1., 3.*x0, 3.*x1, uv.x);
                 uv.y = Hermite(0., 1., 3.*y0, 3.*y1, uv.y);
 
-                vec3 color = texture2D(texture, vec2(uv.x, uv.y)).xyz;
-                vec3 texCol = texture2D(texture, vUv).rgb;
-
-                vec4 col = texture2D(texture, vUv);
                 vec2 rPos = vUv+(terrain((vUv.y*20.)+(uTime*10.))/80.);
                 vec2 gPos = vUv+(terrain((vUv.y*22.)+(uTime*10.))/61.);
                 vec2 bPos = vUv+(terrain((vUv.y*14.)+(uTime*10.))/92.);
-
-                float col0R = texture2D(texture,rPos).r;
-                float col0G = texture2D(texture,gPos).g;
-                float col0B = texture2D(texture,bPos).b;
 
                 vec2 rrPos = uv+(terrain((uv.y*20.)+(uTime*10.))/20.);
                 vec2 ggPos = uv+(terrain((uv.y*22.)+(uTime*10.))/21.);
                 vec2 bbPos = uv+(terrain((uv.y*14.)+(uTime*10.))/22.);
 
-                //vec4 portfoliCol = texture2D(portfolioTexture, vUv).rgba;
-                float col1R = texture2D(texture, rrPos).r;
-                float col1G = texture2D(texture, ggPos).g;
-                float col1B = texture2D(texture, bbPos).b;
+                colR = texture2D(texture, mix(rPos, rrPos, uMouse)).r;
+                colG = texture2D(texture, mix(gPos, ggPos, uMouse)).g;
+                colB = texture2D(texture, mix(bPos, bbPos, uMouse)).b;
 
-                colR = col0R * (1.-uMouse) + col1R * uMouse;
-                colG = col0G * (1.-uMouse) + col1G * uMouse;
-                colB = col0B * (1.-uMouse) + col1B * uMouse;
             }
 
 

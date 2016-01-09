@@ -1,21 +1,24 @@
 
-var AboutModel = function( row, col ){
+var WorksModel = function( row, col ){
     this.row = row;
     this.col = col;
-    this.clickable = false;
 
     var number = this.row * 3 + col;
     var worksData = window.app.assets.json.workData[number]
+    this.worksData = worksData;
 
+    this.id    = this.worksData.id;
     this.title = worksData.title;
     this.thumbnail = worksData.thumbnail;
+    
+    this.clickable = true; //worksData.visit ? true : false;
 };
 
-THREE.EventDispatcher.prototype.apply( AboutModel.prototype );
+THREE.EventDispatcher.prototype.apply( WorksModel.prototype );
 
-AboutModel.prototype.reset = function(){
+WorksModel.prototype.reset = function(){
 
-}
+};
 
-module.exports = AboutModel;
+module.exports = WorksModel;
 
