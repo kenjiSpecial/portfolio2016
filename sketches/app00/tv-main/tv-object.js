@@ -22,8 +22,8 @@ var TVObject = function( opts ){
     this.tvControllerGeometry = window.app.assets.model.tvController.geometry.clone();
     this.tvControllerMaterial = window.app.assets.model.tvController.material.clone();
     this.tvControllerMesh     = new THREE.Mesh( this.tvControllerGeometry, this.tvControllerMaterial );
-    this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
-    this.tvControllerMesh.position.set( 23.5, -28, 37 );
+    //this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
+    this.tvControllerMesh.position.set( 23.5, -28 + translateY, 37 );
     this.add(this.tvControllerMesh);
 
     var sphere = new THREE.SphereGeometry(1, 1);
@@ -49,7 +49,6 @@ var TVObject = function( opts ){
 
     this.scale.y = 0.01;
 
-    //setTimeout(this.turnOn.bind(this), 500);
 };
 
 TVObject.prototype = Object.create(THREE.Object3D.prototype);
@@ -92,16 +91,7 @@ TVObject.prototype.onMouseOut = function(){
 }
 
 TVObject.prototype.turnOn = function(){
-    //audioAction.turn();
-    //setTimeout(function(){
-    //    audioAction.turn();
-    //}, 80);
-    //setTimeout(function(){
-    //    audioAction.turn();
-    //}, 80 * 2);
-    //setTimeout(function(){
-    //    audioAction.turn();
-    //}, 80 * 3);
+    TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: Math.PI * 2/5});
 
     this.glowMat.color = new THREE.Color(0x1111cc);
     setTimeout(function(){

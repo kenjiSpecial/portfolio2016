@@ -85,6 +85,14 @@ module.exports = {
             'linkedin',
         ]
     },
+    controller : {
+        "home"   : 0,
+        "about"  : Math.PI * 2/6,
+        "works"  : Math.PI * 2/6 * 2,
+        "work"   : Math.PI * 2/6 * 3,
+        "sketch" : Math.PI * 2/6 * 4,
+        "contact": Math.PI * 2/6 * 5
+    },
     tvPosition : {
         "x" : 76,
         "y" : 77

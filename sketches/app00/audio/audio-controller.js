@@ -30,13 +30,13 @@ var AudioController = function(){
     gainNode.gain.value = 0;
     this.bgNode= gainNode; */
 
-    this.turnOnSound = new buzz.sound("/assets/sounds/turn.mp3");
-    this.turnOnSound.setVolume( 40 );
+    //this.turnOnSound = new buzz.sound("/assets/sounds/turn.mp3");
+    //this.turnOnSound.setVolume( 40 );
     this.clickSound  = new buzz.sound("/assets/sounds/click.mp3");
     this.mouseOverSound  = new buzz.sound("/assets/sounds/over.mp3");
-    this.mouseOverSound.setVolume( 40 );
-    this.transSound  = new buzz.sound("/assets/sounds/trans5.mp3");
-    this.transSound.setVolume( 70 );
+    this.mouseOverSound.setVolume( 50 );
+    //this.transSound  = new buzz.sound("/assets/sounds/trans5.mp3");
+    //this.transSound.setVolume( 70 );
 
     audioAction.addEventListener(audioAction.TURN, this.turn);
     //audioAction.addEventListener(audioAction.LOADED, this.loaded);

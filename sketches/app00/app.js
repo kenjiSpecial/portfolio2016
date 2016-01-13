@@ -265,43 +265,13 @@ function initLoop(){
 function loop() {
     stats.begin();
 
-
-    //console.log(mouse);
-    /*
-    raycaster.setFromCamera( mouse, camera );
-    //console.log(tvMainScene.rayCaster);
-    var intersects = raycaster.intersectObjects(raycasterObjects);
-    if(intersects.length > 0){
-        if(intersects[ 0 ].object){
-            if(intersected != intersects[ 0 ].object){
-                if(intersected) intersected.material.opacity = 0.01;
-                intersected = intersects[ 0 ].object
-                intersected.material.opacity = 1;
-            }
-        }
-    }else{
-        if(intersected){
-            intersected.material.opacity = 0.01;
-            intersected = null
-        }
-
-    } */
-
     var dt = clock.getDelta();
     customRayCaster.update(mouse);
-
-
-
-    //controls.update();
 
     if(tvContactScene) tvMenuScene.update(dt);
     if(tvMainScene)    tvMainScene.update(dt);
     if(tvContactScene) tvContactScene.update(dt);
-    //tvIndicatorScene.update(dt);
     renderer.render(scene, camera);
-    //renderer.setClearColor ( 0xffff0 )
-    //glowcomposer.render();
-    //finalcomposer.render();
 
     stats.end();
 
@@ -330,5 +300,12 @@ kd.on('pressed', function() {
 
 });
 
+function resize(){
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+};
+
 
 loadStart();
+window.addEventListener('resize', resize);

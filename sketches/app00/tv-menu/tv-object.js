@@ -41,8 +41,8 @@ var TVObject = function( opts, tvScreen ){
     this.tvControllerGeometry = window.app.assets.model.tvController.geometry.clone();
     this.tvControllerMaterial = window.app.assets.model.tvController.material.clone();
     this.tvControllerMesh     = new THREE.Mesh( this.tvControllerGeometry, this.tvControllerMaterial );
-    this.tvControllerMesh.position.set( 23, -28, 37 );
-    this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
+    this.tvControllerMesh.position.set( 23, -28 + translateY, 37 );
+    //this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
     this.add(this.tvControllerMesh);
 
     this.homeModel  = new HomeModel(this.row, this.col);
@@ -115,6 +115,11 @@ TVObject.prototype.onChangeDirectory = function(){
 
 TVObject.prototype.setRouter = function(){
     this.onMouseDisable();
+
+    if(this.tlAngle) this.tlAngle.pause();
+    var angle = constants.controller[appStore.curDirectory];
+    this.tlAngle = TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: angle});
+
 
     //console.log(appStore.prevDirectory);
     if(appStore.prevDirectory == 'works'){
@@ -308,6 +313,9 @@ TVObject.prototype.turnOn = function(){
     //console.log('turnOn');
 
     //audioAction.turn();
+    //var angle = (this.idNumber/9 *  + 1) * Math.PI * 2/5
+    var angle = Math.PI * 2/5
+    TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: angle});
 
     this.glowMat.color = new THREE.Color(0x1111cc);
     if(this.turnOnColor) {

@@ -22,8 +22,8 @@ var TVObject = function( opts, glowObject){
     this.tvControllerGeometry = window.app.assets.model.tvController.geometry.clone();
     this.tvControllerMaterial = window.app.assets.model.tvController.material.clone()
     this.tvControllerMesh     = new THREE.Mesh( this.tvControllerGeometry, this.tvControllerMaterial );
-    this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
-    this.tvControllerMesh.position.set( 23.5, -28, 37 );
+    //this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
+    this.tvControllerMesh.position.set( 23.5, -28+ translateY, 37 );
     this.add(this.tvControllerMesh);
 
     var sphere = new THREE.SphereGeometry(1, 1);
@@ -62,6 +62,10 @@ TVObject.prototype.constructor = TVObject.prototype;
 
 TVObject.prototype.onChangeDirectory = function(event){
     //console.log('??');
+    if(this.tlAngle) this.tlAngle.pause();
+    var angle = constants.controller[appStore.curDirectory];
+    this.tlAngle = TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: angle});
+
     switch(appStore.curDirectory){
         case 'about':
             this.turnOn();
@@ -93,6 +97,9 @@ TVObject.prototype.update = function(dt){
 };
 
 TVObject.prototype.turnOn = function(){
+    var angle = Math.PI * 2/5 * 2;
+    this.tlAngle = TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: angle});
+
     this.turnOnColor = constants[appStore.curDirectory].lightColor;
 
     setTimeout(function(){
