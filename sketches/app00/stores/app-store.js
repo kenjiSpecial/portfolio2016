@@ -1,13 +1,15 @@
 var appAction = require('../actions/app-action');
+var audioAction = require('../actions/audio-action');
 var _ = require('underscore');
 
 var AppStore = function(){
     _.bindAll(this, 'onMouseOverObject', 'onMouseOutObject', 'onClickObject');
     _.bindAll(this, 'onMouseOverAboutType', 'onMouseOutAboutType', 'onGoToHome');
     _.bindAll(this, 'onMouseOverWorksType', 'onMouseOutWorksType');
-    _.bindAll(this, 'onClickWorks', 'onGoToWorks');
+    _.bindAll(this, 'onClickWorks', 'onGoToWorks', 'onMouseOverContactType', 'onMouseOutContactType', 'onChangeAudioHandler');
 
     this._curDirectory         = 'home';
+    this._isAudio = true;
     this._mouseOverObject     = null;
     this._mainMouseOverObject = null;
 
@@ -18,9 +20,13 @@ var AppStore = function(){
     appAction.addEventListener(appAction.MOUSE_OUT_ABOUT_TYPE, this.onMouseOutAboutType);
     appAction.addEventListener(appAction.MOUSE_OVER_WORKS_TYPE, this.onMouseOverWorksType);
     appAction.addEventListener(appAction.MOUSE_OUT_WORKS_TYPE, this.onMouseOutWorksType);
+    appAction.addEventListener(appAction.MOUSE_OVER_CONTACT_TYPE, this.onMouseOverContactType);
+    appAction.addEventListener(appAction.MOUSE_OUT_CONTACT_TYPE, this.onMouseOutContactType);
     appAction.addEventListener(appAction.GO_TO_HOME, this.onGoToHome);
     appAction.addEventListener(appAction.GO_TO_WORKS, this.onGoToWorks);
     appAction.addEventListener(appAction.CLICK_WORKS, this.onClickWorks);
+
+    audioAction.addEventListener(audioAction.CHANGE_AUDIO, this.onChangeAudioHandler );
 }
 
 THREE.EventDispatcher.prototype.apply( AppStore.prototype );
@@ -33,13 +39,16 @@ AppStore.prototype.CHANGE_DIRECTORY               = 'changeDirectory';
 AppStore.prototype.MOUSE_ENABLE_CHANGED           = 'mouseEnableChanged';
 AppStore.prototype.MOUSE_ENABLE                   = 'mouseEnable';
 AppStore.prototype.MOUSE_DISABLE                  = 'mouseDisable';
-AppStore.prototype.MOUSE_OVER_ABOUT_TYPE = 'mouseOverAboutType';
-AppStore.prototype.MOUSE_OUT_ABOUT_TYPE  = 'mouseOutAboutType';
-AppStore.prototype.MOUSE_OVER_WORKS_TYPE = 'mouseOverWorksType';
-AppStore.prototype.MOUSE_OUT_WORKS_TYPE  = 'mouseOutWorksType';
-AppStore.prototype.GO_TO_HOME            = 'goToHome';
-AppStore.prototype.GO_TO_WORKS           = 'goToWorks';
-AppStore.prototype.CLICK_WORKS           = "clickWorks";
+AppStore.prototype.MOUSE_OVER_ABOUT_TYPE   = 'mouseOverAboutType';
+AppStore.prototype.MOUSE_OUT_ABOUT_TYPE    = 'mouseOutAboutType';
+AppStore.prototype.MOUSE_OVER_WORKS_TYPE   = 'mouseOverWorksType';
+AppStore.prototype.MOUSE_OUT_WORKS_TYPE    = 'mouseOutWorksType';
+AppStore.prototype.MOUSE_OVER_CONTACT_TYPE = 'mouseOverWorksType';
+AppStore.prototype.MOUSE_OUT_CONTACT_TYPE  = 'mouseOutWorksType';
+AppStore.prototype.GO_TO_HOME              = 'goToHome';
+AppStore.prototype.GO_TO_WORKS             = 'goToWorks';
+AppStore.prototype.CLICK_WORKS             = "clickWorks";
+AppStore.prototype.AUDIO_CHANGED           = "audioChanged";
 
 AppStore.prototype.onMouseOverWorksType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_WORKS_TYPE});
@@ -57,6 +66,14 @@ AppStore.prototype.onMouseOutAboutType = function(){
     this.dispatchEvent({type: this.MOUSE_OUT_ABOUT_TYPE});
 };
 
+AppStore.prototype.onMouseOverContactType = function(){
+    this.dispatchEvent({type: this.MOUSE_OVER_CONTACT_TYPE});
+};
+
+AppStore.prototype.onMouseOutContactType = function(){
+    this.dispatchEvent({type: this.MOUSE_OUT_CONTACT_TYPE});
+};
+
 AppStore.prototype.onMouseOverObject = function(ev){
     this.mouseOverProject = ev.object;
 
@@ -68,6 +85,10 @@ AppStore.prototype.onMouseOverObject = function(ev){
 
 }
 
+AppStore.prototype.onChangeAudioHandler = function(){
+    this.isAudio = !this.isAudio;
+};
+
 AppStore.prototype.onMouseOutObject = function(){
     this.mouseOverProject = null;
     this.mainMouseOverObject = null;
@@ -78,6 +99,7 @@ AppStore.prototype.onMouseOutObject = function(){
 AppStore.prototype.onClickObject = function(ev){
     this.curDirectory = ev.object.tag;
     this.selectedObject = ev.object;
+    //console.log(this.curDirectory); console.log( this.selectedObject);
 
     document.body.style.cursor = "default";
     this.mouseOverProject = null;
@@ -187,6 +209,18 @@ Object.defineProperty(AppStore.prototype, 'curDirectory', {
                 this.dispatchEvent({type: this.CHANGE_DIRECTORY });
             }.bind(this), 0);
         }
+    }
+});
+
+Object.defineProperty(AppStore.prototype, 'isAudio', {
+    get : function(){
+        return this._isAudio;
+    },
+    set : function(value){
+        this.isPrevAudio = this._isAudio;
+        this._isAudio = value;
+
+        if(this.isPrevAudio != this._isAudio) this.dispatchEvent({type: this.AUDIO_CHANGED });
     }
 });
 

@@ -7,7 +7,7 @@ var appStore = require('../stores/app-store');
 var appAction = require('../actions/app-action');
 
 var TVScreen = function(){
-    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onMouseOverTweenUpdate', 'onTurnOnComplete');
+    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onMouseOverTweenUpdate', 'onTurnOnComplete', 'onMouseOverTweenUpdate2');
 
     this.rate = 0;
 
@@ -97,7 +97,7 @@ TVScreen.prototype.turnOn = function(){
     tl.to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.1, ease: Quint.easeIn })
         .to(this.tvMaterial.uniforms.uState, 0.1, {value: 0.2})
         .to(this.tvMaterial.uniforms.uState, 0.3, {value: 0.4, onComplete: this.onCompleteTw0 })
-        .to(this.tvMaterial.uniforms.uState, 0.5, {value: 1.0, delay: 0.7, onComplete: this.onTurnOnComplete });
+        .to(this.tvMaterial.uniforms.uState, 0.5, {value: 1.0, delay: 0.1, onComplete: this.onTurnOnComplete });
 
 };
 
@@ -124,11 +124,13 @@ TVScreen.prototype.onBlink = function(){
 }
 
 TVScreen.prototype.onMouseOver = function(){
+    if(appStore.curDirectory != "home") return;
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this, 0.4, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate})
 };
 
 TVScreen.prototype.onMouseOut = function(){
+    if(appStore.curDirectory != "home") return;
     if(this.tw) this.tw.pause();
     this.tw = TweenMax.to(this, 0.4, {rate: 0, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate})
 }
@@ -165,13 +167,56 @@ TVScreen.prototype.onMouseOverTweenUpdate = function(){
 };
 
 TVScreen.prototype.onTransitionHomeStart = function(){
-    var tl = new TimelineMax();
-    tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, delay: 0.1 })
-        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 1, delay: 0.1, onComplete: this.onTurnOnComplete});
+    if(appStore.prevDirectory == 'contact'){
+        this.tvMaterial.uniforms.uState.value = 1;
+        setTimeout(this.onTurnOnComplete, 1000);
+    }else{
+        var tl = new TimelineMax();
+        tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, delay: 0.1 })
+            .to(this.tvMaterial.uniforms.uState, 0.4, {value: 1, delay: 0.1, onComplete: this.onTurnOnComplete});
+
+    }
 
 };
 
+TVScreen.prototype.onTransitionStartContact = function(){
+    //console.log('onTransitionStartContact');
+    this.rate = 0;
+    this.tw = TweenMax.to(this, 0.5, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate2, onComplete: function(){
+        this.rate = 0;
+        setTimeout(this.onTurnOnComplete, 2000);
+    }.bind(this)})
+};
+
+TVScreen.prototype.onMouseOverTweenUpdate2 = function(){
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.save();
+    this.ctx.globalAlpha = 1 - this.rate;
+    this.ctx.fillStyle = '#8888ff';
+    this.ctx.fillRect(this.canvas.width * this.rate, 0, this.canvas.width * (1-this.rate), this.canvas.height);
+    this.ctx.fillStyle = '#ffffff';
+    this.canvasRenderer.fill(this.ctx, 20 + this.canvas.width * (this.rate), 330);
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.globalAlpha = this.rate;
+    this.ctx.fillStyle = '#8888ff';
+    this.canvasRenderer.fill(this.ctx, 20 - this.canvas.width * (1-this.rate), 330);
+    this.ctx.restore();
+
+
+    this.canvasTexture.needsUpdate = true;
+};
+
 TVScreen.prototype.onTransitionStart = function(){
+
+    if(appStore.curDirectory == "contact") {
+        this.onTransitionStartContact();
+        return;
+    }
+
     this.transCanvasRenderer.text = appStore.curDirectory.toUpperCase();
     var bounds = this.transCanvasRenderer.getBounds();
 

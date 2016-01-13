@@ -1,6 +1,7 @@
 var glslify = require('glslify');
 var CanvasRenderer = require('fontpath-canvas');
 var RobotFont = require('../utils/fonts/robot-font');
+var audioAction = require('../actions/audio-action');
 var _ = require('underscore');
 
 var TVScreen = function(){
@@ -102,15 +103,19 @@ TVScreen.prototype.turnOn = function(){
     var tl = new TimelineMax();
     tl.to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.1, ease: Quint.easeIn })
        .to(this.tvMaterial.uniforms.uState, 0.1, {value: 0.2})
-        .to(this.tvMaterial.uniforms.uState, 0.3, {value: 0.4, onComplete: this.onCompleteTw0 })
-        .to(this.tvMaterial.uniforms.uState, 0.6, {value: 1.0, delay: 0.4, onComplete: this.onCompleteTw1 });
+        .to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.4, onComplete: this.onCompleteTw0 })
+        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 1.0, delay: 0.1, onComplete: this.onCompleteTw1 });
 
 };
 
 TVScreen.prototype.onCompleteTw0 = function(){
-    //return;
+    setTimeout(function(){
+        audioAction.click();
+    }, 0)
+
     this.originalValue = 0.4;
     this.count = 0;
+
     setTimeout(this.onBlink, 60);
 }
 
@@ -119,14 +124,15 @@ TVScreen.prototype.onCompleteTw1 = function(){
 };
 
 TVScreen.prototype.onBlink = function(){
-    if(this.count % 2 == 0){
-        this.tvMaterial.uniforms.uState.value = 10;
-    }else{
-        this.tvMaterial.uniforms.uState.value = this.originalValue;
-    }
-
-    this.count++;
-    if(this.count < 4) setTimeout(this.onBlink, 80);
+    //if(this.count % 2 == 0){
+    ////    this.tvMaterial.uniforms.uState.value = 10;
+    ////    //
+    ////}else{
+    ////    this.tvMaterial.uniforms.uState.value = this.originalValue;
+    ////}
+    ////
+    ////this.count++;
+    ////if(this.count < 3) setTimeout(this.onBlink, 50);
 }
 
 TVScreen.prototype.onMouseOver = function(){

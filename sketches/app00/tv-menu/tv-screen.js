@@ -71,7 +71,7 @@ var TVScreen = function(fragmentShader, textData, row, col){
     this.tvMaterial.uniforms.texture.value = this.canvasTexture;
 
     THREE.Mesh.call(this, this.tvPlane, this.tvMaterial);
-    this.customDelay = 0.4 + 0.2;
+    this.customDelay =  0.1;
     this.customDuration = 0.25;
     this.position.set( 0, 5, 38);
 };
@@ -181,7 +181,8 @@ TVScreen.prototype.onMouseOverComplete = function(){
 TVScreen.prototype.transToNextStage = function(){
     this.transRate = 0;
     this.selectedTag = appStore.selectedObject.tag;
-    this.transRenderer.text =  this.selectedTag.toUpperCase();//'ABOUT'
+    this.transRenderer.letterSpacing = constants[appStore.curDirectory].letterSpacing;
+    this.transRenderer.text =  this.selectedTag.toUpperCase();
 
     if(this.selectedTag == this.tag ){
         //
@@ -204,7 +205,6 @@ TVScreen.prototype.onTransToUpdate = function(){
     this.ctx.restore();
 
     // -----------------------------
-
     this.ctx.save();
     this.ctx.globalAlpha = this.transRate;
     this.ctx.fillStyle =  constants[this.selectedTag].color;

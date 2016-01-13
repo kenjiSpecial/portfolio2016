@@ -14,7 +14,8 @@ module.exports = {
             {'left': 250},
             {'left': 200 - canvasWidth},
             {'left': 170 - canvasWidth * 2}
-        ]
+        ],
+        'letterSpacing' : 0
     },
     works : {
         "lightColor" : new THREE.Color(0xb7940a),
@@ -23,7 +24,8 @@ module.exports = {
             {'left': 220},
             {'left': 180 - canvasWidth},
             {'left': 120 - canvasWidth * 2}
-        ]
+        ],
+        'letterSpacing' : 0
     },
     sketch : {
         "lightColor" : new THREE.Color(0x33aa33),
@@ -32,18 +34,44 @@ module.exports = {
             {'left': 120},
             {'left': 60 - canvasWidth},
             {'left': 40 - canvasWidth * 2}
-        ]
+        ],
+        'letterSpacing' : 0
+    },
+    contact : {
+        "lightColor" : new THREE.Color(0x1111cc),
+        "color" : '#8888ff',
+        "position" : [
+            {'left': 0},
+            {'left': -60 - canvasWidth },
+            {'left': -120 - canvasWidth * 2 },
+        ],
+        'letterSpacing' : -5,
     },
     work : {
         "lightColor"       : new THREE.Color(0x333333),
         "heightLightColor" : new THREE.Color(0x999999),
     },
     turnOffColor : new THREE.Color(0xcc1111),
+    blackColor   : new THREE.Color(0x333333),
     types : [
         "about",
         "works",
         "sketch"
     ],
+    contactPage :{
+        type : [
+            ['contactMail', 'contactTwitter', 'contactFacebook'],
+            ['contactLinkedin', 'contactGithub', 'contactCodepen'],
+            ['contactInstgram', 'contactTumblr', 'contactPinterest']
+        ]
+    },
+    sketchPage : {
+        type : [
+            ['sketchWaterPaint', 'sketchWebGlDojo', 'sketch2DPhy'],
+            ['sketchCS', 'contactCodepen', 'sketchGreeting'],
+            ['sketchCanvasTest', 'sketchVoronoiBody', null]
+        ]
+    },
     aboutPage : {
         type : [
             'name',

@@ -31,9 +31,18 @@ TVScene.prototype.update = function(dt){
     this.tvArr.forEach(function(tvObject){
         tvObject.update(dt);
     });
+}
 
-    //
+TVScene.prototype.invisible = function(){
+    this.tvArr.forEach(function(tvObject){
+        tvObject.visible = false;
+    });
+};
 
+TVScene.prototype.start = function(){
+    this.tvArr.forEach(function(tvObject){
+        tvObject.start()
+    });
 }
 
 module.exports = TVScene;

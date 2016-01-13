@@ -1,6 +1,7 @@
 var TVScreen = require('./tv-screen');
 var appStore = require('../stores/app-store');
 var appAction = require('../actions/app-action');
+var audioAction = require('../actions/audio-action');
 var constants = require('../utils/constants');
 var _ = require('underscore');
 
@@ -9,6 +10,8 @@ var TVObject = function( opts, glowObject){
     _.bindAll(this, 'onMouseEnable', 'onMouseDisable', 'onClickToWorks' );
     THREE.Object3D.call( this );
     this.type = 'tvContact';
+
+    var translateY = 75/2;
 
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();
@@ -19,6 +22,7 @@ var TVObject = function( opts, glowObject){
     this.tvControllerGeometry = window.app.assets.model.tvController.geometry.clone();
     this.tvControllerMaterial = window.app.assets.model.tvController.material.clone()
     this.tvControllerMesh     = new THREE.Mesh( this.tvControllerGeometry, this.tvControllerMaterial );
+    this.tvControllerMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
     this.tvControllerMesh.position.set( 23.5, -28, 37 );
     this.add(this.tvControllerMesh);
 
@@ -26,14 +30,17 @@ var TVObject = function( opts, glowObject){
     this.glowMat = new THREE.MeshBasicMaterial({color: 0xcc1111});
     var lightMesh = new THREE.Mesh(sphere, this.glowMat);
     lightMesh.position.set( -23 , -28, 39 );
+    lightMesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
     this.add(lightMesh)
 
     this.tvScreen = new TVScreen();
+    this.tvScreen.geometry.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
     this.tvScreen.addEventListener("mouseEnable", this.onMouseEnable );
     this.add(this.tvScreen);
 
 
     var cubeGeo = new THREE.CubeGeometry( 75, 75, 75);
+    cubeGeo.applyMatrix( new THREE.Matrix4().makeTranslation ( 0, translateY, 0 ) );
     var cubeMat = new THREE.MeshBasicMaterial({color:0x1111cc, opacity: 0.01, transparent: true});
     this.rayCaster = new THREE.Mesh(cubeGeo, cubeMat);
     this.add(this.rayCaster);
@@ -46,6 +53,8 @@ var TVObject = function( opts, glowObject){
     appStore.addEventListener( appStore.CHANGE_DIRECTORY, this.onChangeDirectory);
 
     //setTimeout(this.turnOn.bind(this), 840);
+
+    this.scale.y = 0.000001;
 };
 
 TVObject.prototype = Object.create(THREE.Object3D.prototype);
@@ -61,6 +70,12 @@ TVObject.prototype.onChangeDirectory = function(event){
             this.turnOff();
             break;
         case 'works':
+            this.turnOn();
+            break;
+        case 'contact':
+            this.turnOn();
+            break;
+        case 'sketch':
             this.turnOn();
             break;
         case 'work':
@@ -79,6 +94,7 @@ TVObject.prototype.update = function(dt){
 
 TVObject.prototype.turnOn = function(){
     this.turnOnColor = constants[appStore.curDirectory].lightColor;
+
     setTimeout(function(){
         this.glowMat.color = this.turnOnColor;
     }.bind(this), 600);
@@ -114,12 +130,13 @@ TVObject.prototype.onMainMouseOverObjectUpdated = function(){
 TVObject.prototype.onMouseOver = function(){
     //console.log(this.isTurnOn);
     if(!this.isTurnOn) return;
-
+    audioAction.mouseOver();
     this.tvScreen.onMouseOver();
+
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.3, ease: Quint.easeOut});
 
-    if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works') {
+    if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works' || appStore.curDirectory == 'sketch' || appStore.curDirectory == 'contact' ) {
         window.addEventListener('click', this.onClickToHome );
     }else if(appStore.curDirectory == 'work'){
         window.addEventListener('click', this.onClickToWorks );
@@ -142,6 +159,8 @@ TVObject.prototype.onMouseOut = function(){
 
 TVObject.prototype.onClickToWorks = function(){
     this.onMouseDisable();
+    audioAction.click();
+
     setTimeout(function(){
         this.onMouseEnable();
     }.bind(this), 1200);
@@ -154,6 +173,8 @@ TVObject.prototype.onClickToWorks = function(){
 
 TVObject.prototype.onClickToHome = function(){
     this.onMouseDisable();
+    audioAction.click();
+
     appAction.goToHome();
 
     window.removeEventListener('click', this.onClickToHome );
@@ -182,5 +203,16 @@ TVObject.prototype.onMouseEnable = function(){
 TVObject.prototype.onMouseDisable = function(){
     this.rayCaster.mouseEnable = false;
 }
+
+TVObject.prototype.start = function(){
+    var delay = 800; //this.col * 100 + (2 - this.row) * 200;
+    setTimeout(function(){
+        this.visible = true;
+        TweenLite.to(this.scale,    0.6, {y: 1/3, ease: Elastic.easeOut.config(1, 0.8) });
+        //setTimeout(this.turnOn.bind(this), 200);
+        //setTimeout(function(){audioAction.click();}, 400);
+    }.bind(this), delay);
+}
+
 
 module.exports = TVObject;

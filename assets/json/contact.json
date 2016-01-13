@@ -1,0 +1,38 @@
+{
+  "contactMail": {
+    "isMail": true,
+    "url": "k.saito.1985@gmail.com"
+  },
+  "contactCodepen": {
+    "isMail": false,
+    "url": "http://codepen.io/kenjiSpecial"
+  },
+  "contactFacebook": {
+    "isMail": false,
+    "url": "https://www.facebook.com/kenjiSpecial"
+  },
+  "contactGithub": {
+    "isMail": false,
+    "url": "https://github.com/kenjiSpecial"
+  },
+  "contactLinkedin": {
+    "isMail": false,
+    "url": "https://www.linkedin.com/in/kenji-saito-5a327340"
+  },
+  "contactPinterest": {
+    "isMail": false,
+    "url": "https://www.pinterest.com/kenjispecial"
+  },
+  "contactTumblr": {
+    "isMail": false,
+    "url": "http://archive.kenji-special.info"
+  },
+  "contactTwitter": {
+    "isMail": false,
+    "url": "https://twitter.com/kenji_special"
+  },
+  "contactInstgram": {
+    "isMail": false,
+    "url": "https://www.instagram.com/kenji_special"
+  }
+}

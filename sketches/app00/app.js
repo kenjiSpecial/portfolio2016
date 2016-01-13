@@ -9,6 +9,9 @@ var TVMenuScene      = require('./tv-menu-scene');
 var TVMainScene      = require('./tv-main-scene');
 var TVIndicatorScene = require('./tv-indicator-scene')
 var TVContactScene   = require('./tv-contact-scene');
+var LoaderScene      = require('./loader-scene');
+
+var loaderScene;
 
 var CustomLoader     = require('./loader/loader');
 
@@ -16,7 +19,9 @@ var raf = require('raf');
 var scene = new THREE.Scene();
 var glowscene = new THREE.Scene();
 var controls, renderer;
-var camera;
+var camera, camOriginalPosition, camLookAtOriginalPosition;
+
+var audioController = require('./audio/audio-controller');
 
 var tvMenuScene, tvMainScene, tvContactScene, tvIndicatorScene;
 var clock;
@@ -47,32 +52,12 @@ var noiseTexture;
 var customLoader;
 var renderModelGlow;
 var glowcomposer;
+var initId;
 
-var customLoader = new CustomLoader();
-customLoader.addEventListener(customLoader.ASSETS_LOADED, onAssetsLoaded);
-customLoader.start();
-
-function onAssetsLoaded(){
-    //console.log('onAssetsLoaded');
-    init();
-};
-
-function init() {
+function loadStart(){
     var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
     renderTargetGlow = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
     renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
-
-    tvMenuScene = new TVMenuScene();
-    scene.add(tvMenuScene);
-
-    tvMainScene = new TVMainScene();
-    scene.add(tvMainScene);
-
-    tvContactScene = new TVContactScene();
-    scene.add(tvContactScene);
-
-    //tvIndicatorScene = new TVIndicatorScene();
-    //scene.add(tvIndicatorScene);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, .15);
     directionalLight.position.set( 0, 100, 120);
@@ -80,8 +65,8 @@ function init() {
     window.app.scene = scene;
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.set( 15, 30, 770);
-    camera.lookAt(new THREE.Vector3(50, 0, 0));
+    //camera.position.set( 15, 30, 770);
+    //camera.lookAt(new THREE.Vector3(50, 0, 0));
     customRayCaster.setCamera(camera);
     window.app.camera = camera;
 
@@ -90,7 +75,6 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.body.appendChild(renderer.domElement);
-
 
     glowscene.add( new THREE.AmbientLight( 0xffffff ) );
 
@@ -171,9 +155,110 @@ function init() {
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-    clock = new THREE.Clock();
+    loaderScene = new LoaderScene(renderer);
+    loaderScene.start();
 
-    raf(loop);
+    customLoader = new CustomLoader();
+    //customLoader.addEventListener(customLoader.ASSETS_LOADED, onAssetsLoaded);
+    loaderScene.addEventListener('loaded', onAssetsLoaded);
+
+    setTimeout(function(){
+        customLoader.start()
+    }, 300);
+
+
+
+    clock = new THREE.Clock();
+    raf(initLoop);
+}
+
+function onAssetsLoaded(){
+    raf.cancel(initId);
+
+    tvMenuScene = new TVMenuScene();
+    scene.add(tvMenuScene);
+
+    tvContactScene = new TVContactScene();
+    scene.add(tvContactScene);
+
+    tvMainScene = new TVMainScene();
+    scene.add(tvMainScene);
+
+
+    renderer.render(scene, camera);
+    tvContactScene.invisible();
+    tvMenuScene.invisible()
+
+
+    setTimeout(initMain, 300);
+    setTimeout(init, 1900);
+
+
+    id = raf(loop);
+};
+
+function initMain(){
+
+    tvMainScene.start();
+    //camera.rotation
+    //camera.rotateOnAxis ( new THREE.Vector3(0, 1, 0), Math.PI/3 );
+    //tvMainScene.position
+
+    var transY = 75/2;
+    var ddX = 600 * Math.cos(Math.PI*1/6);
+    var ddY = 600 * Math.sin(Math.PI*1/6);
+    camera.position.set(tvMainScene.position.x + ddX, tvMainScene.position.y , tvMainScene.position.z  + ddY)
+    camLookAtOriginalPosition = tvMainScene.position.clone()
+    camLookAtOriginalPosition.y += transY;
+    camera.lookAt(camLookAtOriginalPosition);
+
+    setTimeout(animationCamera, 1600);
+}
+
+
+function animationCamera(){
+    camera.animationRate   = 0;
+    camera.animationRate1  = 0;
+    camOriginalPosition = new THREE.Vector3();
+    camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
+
+    TweenMax.to(camera, 1.5, {animationRate: 1, onUpdate: onAnimationUpdate, ease: Elastic.easeOut.config(1,1) });
+    TweenMax.to(camera, 2.2, {animationRate1: 1, onUpdate: onLookAtUpdate, ease: Elastic.easeOut.config(1, 1) });
+}
+
+function onAnimationUpdate() {
+    var curPosition = new THREE.Vector3();
+    var xx = 15 * (camera.animationRate) + camOriginalPosition.x * (1 - camera.animationRate);
+    var yy = 30 * (camera.animationRate) + camOriginalPosition.y * (1 - camera.animationRate);
+    var zz = 770 * (camera.animationRate) + camOriginalPosition.z * (1 - camera.animationRate);
+
+    camera.position.set(xx, yy, zz);
+    onLookAtUpdate();
+}
+
+function onLookAtUpdate(){
+    var lookxx = 50 * (camera.animationRate1) + camLookAtOriginalPosition.x * (1-camera.animationRate1);;
+    var lookyy = 37.5 * (camera.animationRate1) + camLookAtOriginalPosition.y * (1-camera.animationRate1);
+    var lookzz = camLookAtOriginalPosition.z * (1-camera.animationRate1);
+
+    camera.lookAt(new THREE.Vector3(lookxx, lookyy, lookzz));
+}
+
+function init() {
+    tvMenuScene.start();
+    tvContactScene.start();
+    //raf(loop);
+}
+
+function initLoop(){
+    stats.begin();
+
+    var dt = clock.getDelta();
+    loaderScene.update( dt, renderer, customLoader );
+    stats.end();
+
+    initId = raf(initLoop);
+
 }
 
 
@@ -201,17 +286,20 @@ function loop() {
         }
 
     } */
-    customRayCaster.update(mouse);
 
     var dt = clock.getDelta();
+    customRayCaster.update(mouse);
+
+
 
     //controls.update();
 
-    tvMenuScene.update(dt);
-    tvMainScene.update(dt);
-    tvContactScene.update(dt);
+    if(tvContactScene) tvMenuScene.update(dt);
+    if(tvMainScene)    tvMainScene.update(dt);
+    if(tvContactScene) tvContactScene.update(dt);
     //tvIndicatorScene.update(dt);
     renderer.render(scene, camera);
+    //renderer.setClearColor ( 0xffff0 )
     //glowcomposer.render();
     //finalcomposer.render();
 
@@ -243,4 +331,4 @@ kd.on('pressed', function() {
 });
 
 
-
+loadStart();

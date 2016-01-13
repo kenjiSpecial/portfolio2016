@@ -24,4 +24,5 @@ TVScene.prototype.update = function(dt){
     this.tvMainObject.update(dt);
 }
 
+
 module.exports = TVScene;

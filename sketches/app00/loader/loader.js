@@ -1,7 +1,7 @@
 THREE.Cache.enabled = true;
 var loaderFiles = require('./loader-files');
 var _ = require('underscore');
-
+var audioAction = require('../actions/audio-action');
 var jsonLoadFunction = require('../utils/functions').loadJSON;
 
 function load(url, onLoad, name){
@@ -109,6 +109,7 @@ Loader.prototype.onLoadImage = function(image){
 
 Loader.prototype.onLoadJson = function(response, fileName){
     var dataJson = JSON.parse(response);
+    //https://www.instagram.com/kenji_special/
     window.app.assets.json[fileName] = dataJson;
     this.fileCount++;
     //console.log(this.fileCount + "/" + this.fileLength);
@@ -129,6 +130,11 @@ Loader.prototype.loaded = function(){
     });
 
     this.dispatchEvent({type: this.ASSETS_LOADED});
+    audioAction.loaded();
 }
+
+Loader.prototype.getRate = function(){
+    return this.fileCount / this.fileLength ? this.fileCount / this.fileLength : 0;
+};
 
 module.exports = Loader;
