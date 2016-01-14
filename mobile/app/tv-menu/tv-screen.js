@@ -196,6 +196,7 @@ TVScreen.prototype.transToNextStage = function(){
 }
 
 TVScreen.prototype.onTransToUpdate = function(){
+    /**
     this.ctx.fillStyle = constants.white;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -215,7 +216,7 @@ TVScreen.prototype.onTransToUpdate = function(){
     this.ctx.fillStyle = constants.white;
     this.transRenderer.fill(this.ctx, -this.canvas.width/2 * (1-this.transRate) +constants[this.selectedTag].position[this.col].left, 450);
     this.ctx.restore();
-    this.canvasTexture.needsUpdate = true;
+    this.canvasTexture.needsUpdate = true; */
 };
 
 TVScreen.prototype.transEndStart = function(){
@@ -224,6 +225,7 @@ TVScreen.prototype.transEndStart = function(){
 }
 
 TVScreen.prototype.onTransToUpdate2 = function(){
+    /**
     this.ctx.fillStyle = constants[this.selectedTag].color;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -231,8 +233,9 @@ TVScreen.prototype.onTransToUpdate2 = function(){
     this.ctx.fillStyle = constants.white
     this.transRenderer.fill(this.ctx, this.canvas.width * this.transRate + constants[this.selectedTag].position[this.col].left, 450);
     this.ctx.restore();
+    */
 
-    this.canvasTexture.needsUpdate = true;
+    //this.canvasTexture.needsUpdate = true;
 }
 
 

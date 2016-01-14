@@ -4,6 +4,7 @@
 
 var customRayCaster = require('./custom-raycaster/custom-raycaster');
 var keydown = require('keydown');
+var customEvent = require('./utils/custom-event');
 
 var TVMenuScene      = require('./tv-menu-scene');
 var TVMainScene      = require('./tv-main-scene');
@@ -223,13 +224,15 @@ function onDocumentMouseMove(event){
 
 
 function onDocumentTouchEnd(event){
-    mouse.x = ( event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
+    //console.log(event);
+    //mouse.x = ( event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+    //mouse.y = - ( event.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
 
     var curTime = Date.now();
 
     if(curTime - touchStartTime < 300){
-        //
+        console.log('click');
+        customEvent.dispatchEvent ( {type: "click"} );
     }
 
 

@@ -15,11 +15,13 @@ var WorkModel    = require('./model/work-model');
 var ContactModel = require('./model/contact-model');
 var SketchModel  = require('./model/sketch-model');
 
+var customEvent = require('../utils/custom-event');
+
 //var audioAction = require('../actions/audio-action');
 
 var TVObject = function( opts, tvScreen ){
     _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onClickHandler', 'onTransitionStart', 'onChangeDirectory', 'onMouseEnable', 'onMouseDisable');
-    _.bindAll(this, 'onClickWorksHandler', 'onClickWorkHandler', 'onClickContactHandler', 'onClickSketchHandler', 'onClickAboutHandler');
+    _.bindAll(this, 'onClickWorksHandler', 'onClickWorkHandler', 'onClickContactHandler', 'onClickSketchHandler', 'onClickAboutHandler', 'onClickEventHandler');
 
     THREE.Object3D.call( this );
 
@@ -352,19 +354,28 @@ TVObject.prototype.onMainMouseOverObjectUpdated = function(){
 TVObject.prototype.onMouseOver = function(){
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.3, ease: Quint.easeOut});
-    if(appStore.curDirectory == 'home') window.addEventListener('click', this.onClickHandler );
+
+    customEvent.addEventListener('click', this.onClickEventHandler );
+};
+
+TVObject.prototype.onClickEventHandler = function(){
+
+    customEvent.removeEventListener('click', this.onClickEventHandler );
+
+    if(appStore.curDirectory == 'home') customEvent.addEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOverAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOverWorks();
     else if(appStore.curDirectory == 'work')  this.onMouseOverWork();
     else if(appStore.curDirectory == 'contact')  this.onMouseOverContact();
     else if(appStore.curDirectory == 'sketch') this.onMouseOverSketch();
-};
+
+}
 
 TVObject.prototype.onMouseOverAbout = function(){
     this.aboutTvScreen.onMouserOver();
 
     if(this.aboutModel.clickable){
-        window.addEventListener('click', this.onClickAboutHandler );
+        customEvent.addEventListener('click', this.onClickAboutHandler );
     }
 };
 
@@ -372,21 +383,21 @@ TVObject.prototype.onMouseOverWorks = function(){
     this.worksTvScreen.onMouserOver();
 
     if(this.worksModel.clickable){
-        window.addEventListener('click', this.onClickWorksHandler );
+        customEvent.addEventListener('click', this.onClickWorksHandler );
     }
 };
 
 TVObject.prototype.onMouseOverWork = function(){
     if(this.workModel.clickable){
         this.worksTvScreen.onWorkMouseOver();
-        window.addEventListener('click', this.onClickWorkHandler);
+        customEvent.addEventListener('click', this.onClickWorkHandler);
     }
 };
 
 TVObject.prototype.onMouseOverContact = function(){
     if(this.contactModel.clickable){
         this.contactTVScreen.onMouserOver();
-        window.addEventListener('click', this.onClickContactHandler);
+        customEvent.addEventListener('click', this.onClickContactHandler);
     }
 };
 
@@ -395,17 +406,16 @@ TVObject.prototype.onMouseOverSketch = function(){
 
     if(this.sketchModel.clickable){
         this.sketchTVScreen.onMouserOver();
-        window.addEventListener('click', this.onClickSketchHandler);
+        customEvent.addEventListener('click', this.onClickSketchHandler);
     }
 }
 
 TVObject.prototype.onMouseOut = function(){
-    //console.log('mouseout');
-    //if(appStore.curDirectory != 'home') return;
+    customEvent.removeEventListener('click', this.onClickEventHandler );
 
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
-    if(appStore.curDirectory == 'home') window.removeEventListener('click', this.onClickHandler );
+    if(appStore.curDirectory == 'home') customEvent.removeEventListener('click', this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOutAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOutWorks();
     else if(appStore.curDirectory == 'work' ) this.onMouseOutWork();
@@ -425,39 +435,39 @@ TVObject.prototype.onMouseOutAbout = function(){
     this.aboutTvScreen.onMouserOut();
 
     if(this.aboutModel.clickable){
-        window.removeEventListener('click', this.onClickAboutHandler );
+        customEvent.removeEventListener('click', this.onClickAboutHandler );
     }
 }
 
 TVObject.prototype.onMouseOutWorks = function(){
     this.worksTvScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickWorksHandler );
+    customEvent.removeEventListener('click', this.onClickWorksHandler );
 };
 
 TVObject.prototype.onMouseOutContact = function(){
     this.contactTVScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickContactHandler );
+    customEvent.removeEventListener('click', this.onClickContactHandler );
 };
 
 TVObject.prototype.onMouseOutSketch = function(){
     if(!this.curModel.type) return;
 
     this.sketchTVScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickSketchHandler );
+    customEvent.removeEventListener('click', this.onClickSketchHandler );
 }
 
 TVObject.prototype.onMouseOutWork = function(){
     document.body.style.cursor = "default";
     if(this.workModel.clickable){
         this.worksTvScreen.onWorkMouseOut();
-        window.removeEventListener('click', this.onClickWorkHandler );
+        customEvent.removeEventListener('click', this.onClickWorkHandler );
     }
 
 }
 
 TVObject.prototype.onClickHandler = function(){
     appAction.clickObject(this);
-    window.removeEventListener('click', this.onClickHandler );
+    customEvent.removeEventListener('click', this.onClickHandler );
 
 };
 
@@ -473,7 +483,7 @@ TVObject.prototype.onClickWorksHandler = function(){
     } else {
         appAction.clickWorks(this.worksModel);
     }
-    window.removeEventListener('click', this.onClickWorksHandler );
+    customEvent.removeEventListener('click', this.onClickWorksHandler );
 };
 
 TVObject.prototype.onClickAboutHandler = function(){
@@ -482,7 +492,7 @@ TVObject.prototype.onClickAboutHandler = function(){
     if(win) win.focus();
     else alert('Please allow popups for this site');
 
-    window.removeEventListener('click', this.onClickAboutHandler );
+    customEvent.removeEventListener('click', this.onClickAboutHandler );
 }
 
 TVObject.prototype.onClickWorkHandler = function(){
@@ -495,7 +505,7 @@ TVObject.prototype.onClickWorkHandler = function(){
         //Broswer has blocked it
         alert('Please allow popups for this site');
     }
-    window.removeEventListener('click', this.onClickWorkHandler );
+    customEvent.removeEventListener('click', this.onClickWorkHandler );
 };
 
 TVObject.prototype.onClickContactHandler = function(){
@@ -517,7 +527,7 @@ TVObject.prototype.onClickContactHandler = function(){
         }
     }
     //url
-    window.removeEventListener('click', this.onClickContactHandler );
+    customEvent.removeEventListener('click', this.onClickContactHandler );
 };
 
 TVObject.prototype.onClickSketchHandler = function(){
@@ -529,7 +539,7 @@ TVObject.prototype.onClickSketchHandler = function(){
         //Broswer has blocked it
         alert('Please allow popups for this site');
     }
-    window.removeEventListener('click', this.onClickSketchHandler );
+    customEvent.removeEventListener('click', this.onClickSketchHandler );
 }
 
 TVObject.prototype.onTransitionStart = function(){
