@@ -1,0 +1,26 @@
+{
+  "sketchCS" : {
+    "url" : "http://cs.kenji-special.info"
+  },
+  "sketch2DPhy" : {
+    "url" : "http://2d-phy.kenji-special.info"
+  },
+  "sketchCanvasTest" : {
+    "url" : "http://kenjispecial.github.io/CavnasRequireBackboneBoilerplate"
+  },
+  "sketchGreeting" : {
+    "url" : "http://kenjispecial.github.io/greeting-2014"
+  },
+  "sketchVoronoiBody" : {
+    "url" : "https://vimeo.com/35828142"
+  },
+  "sketchWaterPaint" : {
+    "url" : "http://kenjispecial.github.io/webgl-sketch-dojo/app/07-postprocessing-water-paint/"
+  },
+  "contactCodepen" : {
+    "url" : "http://codepen.io/kenjiSpecial"
+  },
+  "sketchWebGlDojo" : {
+    "url" : "http://kenjispecial.github.io/webgl-sketch-dojo"
+  }
+}
