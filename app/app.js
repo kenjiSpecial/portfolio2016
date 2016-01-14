@@ -1,6 +1,6 @@
 
-require('../../vendors/TrackballControls');
-require('./utils/ShaderExtras');
+//require('../../vendors/TrackballControls');
+//require('./utils/ShaderExtras');
 
 var customRayCaster = require('./custom-raycaster/custom-raycaster');
 var keydown = require('keydown');
@@ -35,17 +35,8 @@ window.app = {
     }
 };
 
-var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
-var bluriness = 3;
 var mouse = new THREE.Vector2( 1000, 1000 );
-var intersected;
 
-hblur.uniforms[ 'h' ].value = bluriness / window.innerWidth;
-vblur.uniforms[ 'v' ].value = bluriness / window.innerHeight;
-
-var effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 var stats;
 var finalcomposer;
 var noiseTexture;
@@ -75,67 +66,6 @@ function loadStart(){
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.body.appendChild(renderer.domElement);
-
-    glowscene.add( new THREE.AmbientLight( 0xffffff ) );
-
-    var renderModelGlow = new THREE.RenderPass( glowscene, camera );
-
-    glowcomposer = new THREE.EffectComposer( renderer, renderTargetGlow );
-
-    glowcomposer.addPass( renderModelGlow );
-    glowcomposer.addPass( hblur );
-    glowcomposer.addPass( vblur );
-    glowcomposer.addPass( hblur );
-    glowcomposer.addPass( vblur );
-
-    var finalshader = {
-        uniforms: {
-            tDiffuse: { type: "t", value: 0, texture: null },
-            tGlow: { type: "t", value: 1, texture: null }
-        },
-
-        vertexShader: [
-            "varying vec2 vUv;",
-
-            "void main() {",
-
-            "vUv = vec2( uv.x,  uv.y );",
-            "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-            "}"
-        ].join("\n"),
-
-        fragmentShader: [
-            "uniform sampler2D tDiffuse;",
-            "uniform sampler2D tGlow;",
-
-            "varying vec2 vUv;",
-
-            "void main() {",
-
-            "vec4 texel = texture2D( tDiffuse, vUv );",
-            "vec4 glow = texture2D( tGlow, vUv );",
-            "gl_FragColor = texel + vec4(0.5, 0.75, 1.0, 1.0) * glow * 2.0;",
-
-            "}"
-        ].join("\n")
-    };
-
-    finalshader.uniforms[ 'tGlow' ].value = renderTargetGlow; // glowcomposer.renderTarget2;
-
-    var renderModel = new THREE.RenderPass( scene, camera );
-    var finalPass = new THREE.ShaderPass( finalshader );
-    finalPass.needsSwap = true;
-    finalPass.renderToScreen = true;
-
-    renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
-
-    finalcomposer = new THREE.EffectComposer( renderer);
-    finalcomposer .setSize(window.innerWidth , window.innerHeight);
-
-    finalcomposer.addPass( renderModel );
-    finalcomposer.addPass( effectFXAA );
-    finalcomposer.addPass( finalPass );
 
 
     //renderModelGlow = new THREE.RenderPass( glowscene, glowcamera );

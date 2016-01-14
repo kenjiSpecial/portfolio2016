@@ -19,7 +19,7 @@ var audioAction = require('../actions/audio-action');
 
 var TVObject = function( opts, tvScreen ){
     _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onClickHandler', 'onTransitionStart', 'onChangeDirectory', 'onMouseEnable', 'onMouseDisable');
-    _.bindAll(this, 'onClickWorksHandler', 'onClickWorkHandler', 'onClickContactHandler', 'onClickSketchHandler');
+    _.bindAll(this, 'onClickWorksHandler', 'onClickWorkHandler', 'onClickContactHandler', 'onClickSketchHandler', 'onClickAboutHandler');
 
     THREE.Object3D.call( this );
 
@@ -363,6 +363,10 @@ TVObject.prototype.onMouseOver = function(){
 
 TVObject.prototype.onMouseOverAbout = function(){
     this.aboutTvScreen.onMouserOver();
+
+    if(this.aboutModel.clickable){
+        window.addEventListener('click', this.onClickAboutHandler );
+    }
 };
 
 TVObject.prototype.onMouseOverWorks = function(){
@@ -420,6 +424,10 @@ TVObject.prototype.onMouseOutType = function(){
 
 TVObject.prototype.onMouseOutAbout = function(){
     this.aboutTvScreen.onMouserOut();
+
+    if(this.aboutModel.clickable){
+        window.removeEventListener('click', this.onClickAboutHandler );
+    }
 }
 
 TVObject.prototype.onMouseOutWorks = function(){
@@ -452,9 +460,7 @@ TVObject.prototype.onClickHandler = function(){
     appAction.clickObject(this);
     window.removeEventListener('click', this.onClickHandler );
     audioAction.click();
-    setTimeout(function(){
-        audioAction.trans();
-    }, 900);
+
 };
 
 TVObject.prototype.onClickWorksHandler = function(){
@@ -472,6 +478,16 @@ TVObject.prototype.onClickWorksHandler = function(){
     audioAction.click();
     window.removeEventListener('click', this.onClickWorksHandler );
 };
+
+TVObject.prototype.onClickAboutHandler = function(){
+    document.body.style.cursor = "default";
+    var win = window.open(this.aboutModel.url, '_blank');
+    if(win) win.focus();
+    else alert('Please allow popups for this site');
+
+    audioAction.click();
+    window.removeEventListener('click', this.onClickAboutHandler );
+}
 
 TVObject.prototype.onClickWorkHandler = function(){
     document.body.style.cursor = "default";
