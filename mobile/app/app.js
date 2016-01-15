@@ -294,7 +294,6 @@ function onOrientationHandler(){
 }
 
 customEvent.addEventListener('mouseReset', function(){
-    console.log('rest');
     setTimeout(function(){
         mouse.x = 9999;
         mouse.y = 9999;

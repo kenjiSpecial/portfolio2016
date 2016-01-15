@@ -47,8 +47,7 @@ module.exports = {
         {name: 'sketchVoronoiBody',         directory: './assets/sketch/voronoi-body.jpg'},
         {name: 'sketchWaterPaint',          directory: './assets/sketch/water-paint.jpg'},
         {name: 'sketchWebGlDojo',           directory: './assets/sketch/webgl-dojo.jpg'},
-        {name: 'audioOn',                   directory : './assets/sounds/audio-on.jpg'},
-        {name: 'audioOff',                  directory : './assets/sounds/audio-off.jpg'},
+        {name: 'audioOn',                   directory : './assets/sounds/audio-on.jpg'}
     ],
     json : [
         {name : "workData",    directory : './assets/json/works.json'},

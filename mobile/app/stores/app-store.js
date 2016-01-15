@@ -201,6 +201,7 @@ Object.defineProperty(AppStore.prototype, 'curDirectory', {
     set : function(value){
         this.prevDirectory = this._curDirectory;
         this._curDirectory = value;
+        ga('send', 'pageview', this._curDirectory);
 
         if(this.prevDirectory != this._curDirectory) {
             setTimeout(function(){
