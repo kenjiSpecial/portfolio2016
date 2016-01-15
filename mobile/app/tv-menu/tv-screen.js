@@ -145,15 +145,16 @@ TVScreen.prototype.onBlink = function(){
 
 TVScreen.prototype.onMouseOverType = function(){
     if(this.tw) this.tw.pause();
-    this.tw = TweenMax.to(this, 0.6, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
+    //this.tw = TweenMax.to(this, 0.6, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
 };
 
 TVScreen.prototype.onMouseOutType = function(){
     if(this.tw) this.tw.pause();
-    this.tw = TweenMax.to(this, 0.6, {rate: 0, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
+    //this.tw = TweenMax.to(this, 0.6, {rate: 0, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate, onComplete: this.onMouseOverComplete})
 };
 
 TVScreen.prototype.onMouseOverTweenUpdate = function(){
+    /**
     this.ctx.fillStyle =  constants.white;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -171,7 +172,7 @@ TVScreen.prototype.onMouseOverTweenUpdate = function(){
     this.ctx.fillStyle =  constants.white;
     this.canvasRenderer.fill(this.ctx, -this.canvas.width * (1-this.rate) + constants[this.tag].position[this.col].left, 450);
     this.ctx.restore();
-    this.canvasTexture.needsUpdate = true;
+    this.canvasTexture.needsUpdate = true; */
 };
 
 TVScreen.prototype.onMouseOverComplete = function(){
@@ -188,10 +189,10 @@ TVScreen.prototype.transToNextStage = function(){
         //
     }else{
         if(this.tw) this.tw.pause();
-        this.tw = TweenMax.to(this, 0.4, {transRate: 1, ease: Power4.easeOut, onUpdate: this.onTransToUpdate, delay: 0.1 * Math.abs(this.row - appStore.selectedObject.row) })
+        //this.tw = TweenMax.to(this, 0.4, {transRate: 1, ease: Power4.easeOut, onUpdate: this.onTransToUpdate, delay: 0.1 * Math.abs(this.row - appStore.selectedObject.row) })
     }
 
-    setTimeout(this.transEndStart, 750);
+    //setTimeout(this.transEndStart, 750);
 
 }
 

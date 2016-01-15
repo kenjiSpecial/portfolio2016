@@ -146,6 +146,7 @@ TVScreen.prototype.backToWorks = function(){
 };
 
 TVScreen.prototype.onMouseOverTweenUpdate = function(){
+    /*
     this.ctx.fillStyle = '#ffffff';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -164,6 +165,7 @@ TVScreen.prototype.onMouseOverTweenUpdate = function(){
     this.ctx.restore();
 
     this.canvasTexture.needsUpdate = true;
+    */
 };
 
 TVScreen.prototype.onTransitionHomeStart = function(){
@@ -181,11 +183,14 @@ TVScreen.prototype.onTransitionHomeStart = function(){
 
 TVScreen.prototype.onTransitionStartContact = function(){
     //console.log('onTransitionStartContact');
+
+    setTimeout(this.onTurnOnComplete, 2000);
+    /**
     this.rate = 0;
     this.tw = TweenMax.to(this, 0.5, {rate: 1, ease: Power4.easeOut, onUpdate: this.onMouseOverTweenUpdate2, onComplete: function(){
         this.rate = 0;
-        setTimeout(this.onTurnOnComplete, 2000);
-    }.bind(this)})
+
+    }.bind(this)}) */
 };
 
 TVScreen.prototype.onMouseOverTweenUpdate2 = function(){
@@ -232,7 +237,7 @@ TVScreen.prototype.onTransitionStart = function(){
 
     var tl = new TimelineMax();
     tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 2, delay: 0.1 })
-        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 3, delay: 0.5, onComplete: this.onTurnOnComplete});
+        .to(this.tvMaterial.uniforms.uState, 0.4, {value: 3, delay: 0.1, onComplete: this.onTurnOnComplete});
 }
 
 

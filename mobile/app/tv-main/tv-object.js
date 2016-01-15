@@ -56,7 +56,9 @@ TVObject.prototype.constructor = TVObject.prototype;
 TVObject.prototype.start = function(){
     //console.log('start?');
     this.scale.y = 0.01;
+    this.visible = false;
     setTimeout(function(){
+        this.visible = true;
         TweenLite.to(this.scale,    1., {y: 1, ease: Elastic.easeOut.config(1, 0.8) });
         setTimeout(this.turnOn.bind(this), 0);
     }.bind(this), 600);

@@ -34,7 +34,7 @@
   },
   "scripts": {
     "start": "budo main.js:bundle.js --live -t glslify | garnish",
-    "build": "browserify main.js -t glslify | uglifyjs -nm > example/bundle.js"
+    "build": "browserify main.js -t glslify | uglifyjs -nm > bundle.js"
   },
   "keywords": [
     "budo",

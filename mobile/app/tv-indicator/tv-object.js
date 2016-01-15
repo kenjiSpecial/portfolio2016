@@ -2,11 +2,14 @@ var TVScreen = require('./tv-screen');
 var appStore = require('../stores/app-store');
 var appAction = require('../actions/app-action');
 var constants = require('../utils/constants');
+
+var customEvent = require('../utils/custom-event');
+
 var _ = require('underscore');
 
 var TVObject = function( opts, glowObject){
     _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onTransitionStart', 'onChangeDirectory', 'onClickToHome');
-    _.bindAll(this, 'onMouseEnable', 'onMouseDisable', 'onClickToWorks' );
+    _.bindAll(this, 'onMouseEnable', 'onMouseDisable', 'onClickToWorks', 'onClickEventHandler');
     THREE.Object3D.call( this );
     this.type = 'tvContact';
 
@@ -133,18 +136,24 @@ TVObject.prototype.onMainMouseOverObjectUpdated = function(){
     }
 }
 
-TVObject.prototype.onMouseOver = function(){
+TVObject.prototype.onMouseOver = function() {
     //console.log(this.isTurnOn);
-    if(!this.isTurnOn) return;
+    if (!this.isTurnOn) return;
     this.tvScreen.onMouseOver();
 
-    if(this.tl) this.tl.pause();
+    if (this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.3, ease: Quint.easeOut});
 
+    if(!customEvent.hasEventListener ( 'click', this.onClickEventHandler  )) customEvent.addEventListener('click', this.onClickEventHandler );
+}
+
+TVObject.prototype.onClickEventHandler = function(){
+    customEvent.dispatchEvent({type: 'mouseReset'});
+
     if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works' || appStore.curDirectory == 'sketch' || appStore.curDirectory == 'contact' ) {
-        window.addEventListener('click', this.onClickToHome );
+        this.onClickToHome();
     }else if(appStore.curDirectory == 'work'){
-        window.addEventListener('click', this.onClickToWorks );
+        this.onClickToWorks();
     }
 };
 
@@ -155,11 +164,7 @@ TVObject.prototype.onMouseOut = function(){
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
 
-    if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works' ) {
-        window.removeEventListener('click', this.onClickToHome );
-    }else if(appStore.curDirectory == 'work'){
-        window.removeEventListener('click', this.onClickToWorks );
-    }
+    customEvent.removeEventListener('click', this.onClickEventHandler );
 }
 
 TVObject.prototype.onClickToWorks = function(){
@@ -172,7 +177,7 @@ TVObject.prototype.onClickToWorks = function(){
     this.tvScreen.onClick();
 
     appAction.goToWorks();
-    window.removeEventListener('click', this.onClickToWorks );
+    customEvent.removeEventListener('click', this.onClickToWorks );
 }
 
 TVObject.prototype.onClickToHome = function(){
@@ -180,7 +185,7 @@ TVObject.prototype.onClickToHome = function(){
 
     appAction.goToHome();
 
-    window.removeEventListener('click', this.onClickToHome );
+    customEvent.removeEventListener('click', this.onClickToHome );
 };
 
 TVObject.prototype.onTransitionStart = function(){

@@ -21,6 +21,7 @@ var scene = new THREE.Scene();
 var glowscene = new THREE.Scene();
 var controls, renderer;
 var camera, camOriginalPosition, camLookAtOriginalPosition;
+var timerId;
 
 
 var tvMenuScene, tvMainScene, tvContactScene, tvIndicatorScene;
@@ -37,7 +38,6 @@ window.app = {
 
 var mouse = new THREE.Vector2( 1000, 1000 );
 
-var stats;
 var finalcomposer;
 var noiseTexture;
 var customLoader;
@@ -72,16 +72,16 @@ function loadStart(){
 
     //controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-    stats = new Stats();
-    stats.setMode( 0 ); // 0: fps, 1: ms, 2: mb
-
-    // align top-left
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.bottom  = '30px';
-    stats.domElement.style.left = '30px';
-    stats.domElement.style.zIndex= 9999;
-
-    document.body.appendChild( stats.domElement );
+    //stats = new Stats();
+    //stats.setMode( 0 ); // 0: fps, 1: ms, 2: mb
+    //
+    //// align top-left
+    //stats.domElement.style.position = 'absolute';
+    //stats.domElement.style.bottom  = '30px';
+    //stats.domElement.style.left = '30px';
+    //stats.domElement.style.zIndex= 9999;
+    //
+    //document.body.appendChild( stats.domElement );
 
     document.addEventListener( 'touchmove',  onDocumentMouseMove, false );
     document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -178,11 +178,11 @@ function init() {
 }
 
 function initLoop(){
-    stats.begin();
+    //stats.begin();
 
     var dt = clock.getDelta();
     loaderScene.update( dt, renderer, customLoader );
-    stats.end();
+    //stats.end();
 
     initId = raf(initLoop);
 
@@ -190,7 +190,7 @@ function initLoop(){
 
 
 function loop() {
-    stats.begin();
+    //stats.begin();
 
     var dt = clock.getDelta();
     customRayCaster.update(mouse);
@@ -200,7 +200,7 @@ function loop() {
     if(tvContactScene) tvContactScene.update(dt);
     renderer.render(scene, camera);
 
-    stats.end();
+    //stats.end();
 
     id = raf(loop);
 }
@@ -208,6 +208,7 @@ function loop() {
 var touchStartTime;
 function onDocumentTouchStart(event){
     touchStartTime = Date.now();
+    //if(timerId) clearTimeout(timerId);
     mouse.x = ( event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
 
@@ -216,25 +217,28 @@ function onDocumentTouchStart(event){
 
 function onDocumentMouseMove(event){
     event.preventDefault();
-
-    mouse.x = ( event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
-
 }
 
 
 function onDocumentTouchEnd(event){
     //console.log(event);
-    //mouse.x = ( event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-    //mouse.y = - ( event.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
+
+    setTimeout(function(){
+        mouse.x = ( event.changedTouches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.changedTouches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
+    }, 0);
 
     var curTime = Date.now();
 
     if(curTime - touchStartTime < 300){
-        console.log('click');
         customEvent.dispatchEvent ( {type: "click"} );
+        /**
+        timerId = setTimeout(function(){
+            mouse.x = 1000;
+            mouse.y = 1000;
+        }, 50)
+        */
     }
-
 
     event.preventDefault();
 }
@@ -273,13 +277,13 @@ function onOrientationHandler(){
         y = event.gamma - 45; // In degree in the range [-90,90]
     }
 
-    cameraTheta1 += (x/ 300 - cameraTheta1) / 10;
-    cameraTheta2 += (y/ 300 - cameraTheta2) / 10;
+    cameraTheta1 += (x/ 80 - cameraTheta1) / 12;
+    cameraTheta2 += (y/ 80 - cameraTheta2) / 12;
 
     var rad = 850;
     camera.position.z = 850 * Math.cos(cameraTheta1) * Math.cos(cameraTheta2);
-    camera.position.x = 850 * Math.sin(cameraTheta1) * Math.cos(cameraTheta2);
-    camera.position.y = 850 * Math.sin(cameraTheta2);
+    camera.position.x = 200 * Math.sin(cameraTheta1) * Math.cos(cameraTheta2);
+    camera.position.y = 200 * Math.sin(cameraTheta2);
 
     camera.lookAt(scene.position);
 
@@ -288,6 +292,14 @@ function onOrientationHandler(){
     camera.updateMatrixWorld();
     scene.updateMatrixWorld();
 }
+
+customEvent.addEventListener('mouseReset', function(){
+    console.log('rest');
+    setTimeout(function(){
+        mouse.x = 9999;
+        mouse.y = 9999;
+    }, 100);
+});
 
 loadStart();
 window.addEventListener('resize', resize);
