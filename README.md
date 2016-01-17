@@ -1,7 +1,5 @@
 # Portfolio2016
 
-coming soon in the end of January 2016.
+![http://kenji-special.tv/assets/site/kenji-facebook.jpg](http://kenji-special.tv/assets/site/kenji-facebook.jpg)
 
-You can see my 2015 portfolio. 
-
-http://kenji-special.info/
+http://kenji-special.tv
