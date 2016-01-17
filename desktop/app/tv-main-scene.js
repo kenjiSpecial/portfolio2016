@@ -25,6 +25,10 @@ TVScene.prototype.start = function(){
 
 TVScene.prototype.update = function(dt){
     this.tvMainObject.update(dt);
-}
+};
+
+TVScene.prototype.updateSpecial = function(){
+    this.tvMainObject.updateSpecial();
+};
 
 module.exports = TVScene;

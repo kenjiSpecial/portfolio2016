@@ -61,7 +61,10 @@ TVObject.prototype = Object.create(THREE.Object3D.prototype);
 TVObject.prototype.constructor = TVObject.prototype;
 
 TVObject.prototype.onChangeDirectory = function(event){
-    //console.log('??');
+    if(appStore.curDirectory == 'special' || appStore.prevDirectory == 'special'){
+        return;
+    }
+
     if(this.tlAngle) this.tlAngle.pause();
     var angle = constants.controller[appStore.curDirectory];
     this.tlAngle = TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: angle});

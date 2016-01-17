@@ -19,8 +19,9 @@ AppAction.prototype.MOUSE_OUT_WORKS_TYPE     = 'mouseOutWorksType';
 AppAction.prototype.MOUSE_OUT_CONTACT_TYPE   = 'mouseOutContactType';
 AppAction.prototype.MOUSE_OVER_CONTACT_TYPE  = 'mouseOverContactType';
 AppAction.prototype.MOUSE_OVER_SKETCH_TYPE   = 'mouseOverSketchType';
-AppAction.prototype.MOUSE_OUT_SKETCH_TYPE   = 'mouseOverSketchType';
+AppAction.prototype.MOUSE_OUT_SKETCH_TYPE    = 'mouseOverSketchType';
 AppAction.prototype.CLICK_WORKS              = "clickWorks";
+AppAction.prototype.CLICK_MAIN               = "clickMain";
 
 AppAction.prototype.onMouseOverAboutType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_ABOUT_TYPE})
@@ -78,15 +79,9 @@ AppAction.prototype.goToWorks = function(){
     this.dispatchEvent({ type: this.GO_TO_WORKS });
 };
 
-
-//
-//AppAction.prototype.mouseEnable = function(){
-//    this.dispatchEvent({ type: this.MOUSE_ENABLE });
-//};
-//
-//AppAction.prototype.mouseDiable = function(){
-//    this.dispatchEvent({ type: this.MOUSE_ENABLE });
-//}
+AppAction.prototype.onClickMain = function(){
+    this.dispatchEvent({ type: this.CLICK_MAIN });
+};
 
 var appAction = new AppAction();
 module.exports = appAction;

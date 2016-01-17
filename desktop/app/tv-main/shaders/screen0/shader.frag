@@ -135,7 +135,7 @@ void main(){
                  colR = texture2D(texture,rPos).r;
                  colG = texture2D(texture,gPos).g;
                  colB = texture2D(texture,bPos).b;
-            }else{
+            }else if(uMouse < 1.){
 
                 vec2 uv = vec2(vUv.x, vUv.y);
                 float a = sin(uTime * 1.0)*0.5 + 0.5;
@@ -163,13 +163,113 @@ void main(){
                 colG = texture2D(texture, mix(gPos, ggPos, uMouse)).g;
                 colB = texture2D(texture, mix(bPos, bbPos, uMouse)).b;
 
+            }else if(uMouse <= 2.){
+                float rate = uMouse - 1.;
+
+                vec2 uv = vec2(vUv.x, vUv.y);
+                vec2 uvv = vec2(vUv.x, vUv.y);
+
+                float a = sin(uTime * 1.0)*0.5 + 0.5;
+                float b = sin(uTime * 1.5)*0.5 + 0.5;
+                float c = sin(uTime * 2.0)*0.5 + 0.5;
+                float d = sin(uTime * 2.5)*0.5 + 0.5;
+
+                float y0 = mix(a, b, uv.x);
+                float y1 = mix(c, d, uv.x);
+                float x0 = mix(a, c, uv.y);
+                float x1 = mix(b, d, uv.y);
+
+                uv.x = Hermite(0., 1., 3.*x0, 3.*x1, uv.x);
+                uv.y = Hermite(0., 1., 3.*y0, 3.*y1, uv.y);
+
+
+                float a1 = sin(uTime * 1.0)*0.5 + 0.5;
+                float b1 = sin(uTime * 1.5)*0.5 + 0.5;
+                float c1 = sin(uTime * 2.0)*0.5 + 0.5;
+                float d1 = sin(uTime * 2.5)*0.5 + 0.5;
+
+                float y01 = mix(a1, b1, uv.x);
+                float y11 = mix(c1, d1, uv.x);
+                float x01 = mix(a1, c1, uv.y);
+                float x11 = mix(b1, d1, uv.y);
+
+                uvv.x = Hermite(0., 1., 3.*x01, 3.*x11, uv.x);
+                uvv.y = Hermite(0., 1., 3.*y01, 3.*y11, uv.y);
+
+
+                vec2 rPos = uv+(terrain((uv.y*20.)+(uTime*10.))/20.);
+                vec2 gPos = uv+(terrain((uv.y*22.)+(uTime*10.))/21.);
+                vec2 bPos = uv+(terrain((uv.y*14.)+(uTime*10.))/22.);
+
+                vec2 rrPos = uvv+(terrain((uvv.y*20.))/6.);
+                vec2 ggPos = uvv+(terrain((uvv.y*22.))/10.);
+                vec2 bbPos = uvv+(terrain((uvv.y*14.))/8.);
+
+                colR = texture2D(texture, mix(rPos, rrPos, rate)).r;
+                colG = texture2D(texture, mix(gPos, ggPos, rate)).g;
+                colB = texture2D(texture, mix(bPos, bbPos, rate)).b;
+
+            }else if(uMouse <= 3.){
+               float rate = uMouse - 2.;
+
+               vec2 uv = vec2(vUv.x, vUv.y);
+               vec2 uvv = vec2(vUv.x, vUv.y);
+
+               float a = sin(uTime * 1.0)*0.5 + 0.5;
+               float b = sin(uTime * 1.5)*0.5 + 0.5;
+               float c = sin(uTime * 2.0)*0.5 + 0.5;
+               float d = sin(uTime * 2.5)*0.5 + 0.5;
+
+               float y0 = mix(a, b, uv.x);
+               float y1 = mix(c, d, uv.x);
+               float x0 = mix(a, c, uv.y);
+               float x1 = mix(b, d, uv.y);
+
+               uv.x = Hermite(0., 1., 3.*x0, 3.*x1, uv.x);
+               uv.y = Hermite(0., 1., 3.*y0, 3.*y1, uv.y);
+
+
+               float a1 = sin(uTime * 1.0)*0.5 + 0.5;
+               float b1 = sin(uTime * 1.5)*0.5 + 0.5;
+               float c1 = sin(uTime * 2.0)*0.5 + 0.5;
+               float d1 = sin(uTime * 2.5)*0.5 + 0.5;
+
+               float y01 = mix(a1, b1, uv.x);
+               float y11 = mix(c1, d1, uv.x);
+               float x01 = mix(a1, c1, uv.y);
+               float x11 = mix(b1, d1, uv.y);
+
+               uvv.x = Hermite(0., 1., 3.*x01, 3.*x11, uv.x);
+               uvv.y = Hermite(0., 1., 3.*y01, 3.*y11, uv.y);
+
+
+//               vec2 rPos = uv+(terrain((uv.y*20.)+(uTime*10.))/20.);
+//               vec2 gPos = uv+(terrain((uv.y*22.)+(uTime*10.))/21.);
+//               vec2 bPos = uv+(terrain((uv.y*14.)+(uTime*10.))/22.);
+
+               vec2 rrPos = uvv+(terrain((uvv.y*20.))/6.);
+               vec2 ggPos = uvv+(terrain((uvv.y*22.))/10.);
+               vec2 bbPos = uvv+(terrain((uvv.y*14.))/8.);
+
+               colR = mix(texture2D(texture, rrPos).r, 1., rate);
+               colG = mix(texture2D(texture, ggPos).g, 1., rate);
+               colB = mix(texture2D(texture, bbPos).b, 1., rate);
             }
 
+            if(uMouse < 2.){
+                n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
 
-            n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) );
-            colR = (colR * n);
-            colG = (colG * n);
-            colB = (colB * n);
+                colR = (colR * n);
+                colG = (colG * n);
+                colB = (colB * n);
+            }else{
+                n = snoise(vec2( vUv.x * 600.  *cos(uTime), vUv.y * 600. *sin(uTime)  ) ); // * (3. - uMouse) + 1. * (uMouse - 2.);
+                float colRate = uMouse - 2.;
+                colR = mix( (colR * n), 0., colRate);
+                colG = mix( (colG * n), 0., colRate);
+                colB = mix( (colB * n), 0., colRate);
+            }
+
 
             gl_FragColor = vec4( colR, colG, colB, 1.); //vec4(n, n, n, 1.0 );
         }

@@ -9,7 +9,7 @@ function descSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-    if ( object.visible === false || !object.mouseEnable ) return;
+    if ( object.visible === false ) return;
 
     object.raycast( raycaster, intersects );
 
@@ -47,8 +47,9 @@ CustomRaycaster.prototype.update = function(mouse){
     this.setFromCamera(mouse, this.camera);
 
     var intersetcs = this.intersectObjects(this.objects);
+    //|| !object.mouseEnable
+    if(intersetcs.length > 0 && intersetcs[0].object.mouseEnable ){
 
-    if(intersetcs.length > 0){
         if( intersetcs[0].object && intersetcs[0].object != appStore.mouseOverProject ){
             appAction.mouseOver(intersetcs[0].object);
         }

@@ -134,7 +134,14 @@ TVObject.prototype.onMouseOut = function(){
 }
 
 TVObject.prototype.onTransitionStart = function(){
+    //console.log('onTransitionStart');
+    if(appStore.curDirectory == 'special' || appStore.prevDirectory == 'special'){
+        return;
+    }
+
     this.onMouseDisable();
+
+
 
 
     if(this.tlAngle) this.tlAngle.pause();
@@ -176,6 +183,10 @@ TVObject.prototype.onTransitionStart = function(){
         this.tvScreen.shutDown();
     }
 
+};
+
+TVObject.prototype.goToSpecial = function(){
+    this.tvScreen.turnOff();
 };
 
 TVObject.prototype.onClickContact = function(){

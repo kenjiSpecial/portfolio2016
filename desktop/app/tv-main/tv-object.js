@@ -1,10 +1,12 @@
 var TVScreen = require('./tv-screen');
 var appStore = require('../stores/app-store');
 var audioAction = require('../actions/audio-action');
+var appAction   = require('../actions/app-action');
 var _ = require('underscore')
 
+
 var TVObject = function( opts ){
-    _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onMouseEnable', 'onMouseDisable');
+    _.bindAll(this, 'onMainMouseOverObjectUpdated', 'onMouseEnable', 'onMouseDisable', 'onClickHandler');
     THREE.Object3D.call( this );
     //console.log(noiseTexture);
 
@@ -47,6 +49,10 @@ var TVObject = function( opts ){
     this.tvScreen.addEventListener('mouseDisable', this.onMouseDisable);
     appStore.addEventListener( appStore.MAIN_MOUSE_OVER_OBJECT_UPDATED, this.onMainMouseOverObjectUpdated );
 
+    this.curModel = {
+        "clickable" : true
+    };
+
     this.scale.y = 0.01;
 
 };
@@ -55,10 +61,8 @@ TVObject.prototype = Object.create(THREE.Object3D.prototype);
 TVObject.prototype.constructor = TVObject.prototype;
 
 TVObject.prototype.start = function(){
-    //console.log('start?');
     this.scale.y = 0.01;
     TweenLite.to(this.scale,    1., {y: 1, ease: Elastic.easeOut.config(1, 0.8) });
-    //TweenLite.from(this.position, 1.2, {y: -77  - 10, ease: Elastic.easeOut.config(1, 0.8) });
     setTimeout(this.turnOn.bind(this), 400);
 }
 
@@ -82,13 +86,33 @@ TVObject.prototype.onMouseOver = function(){
     audioAction.mouseOver();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.2, ease: Quint.easeOut});
     this.tvScreen.onMouseOver();
+
+    window.addEventListener('click', this.onClickHandler);
 };
 
 TVObject.prototype.onMouseOut = function(){
+    if(!this.rayCaster.mouseEnable) return;
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
     this.tvScreen.onMouseOut();
-}
+
+    window.removeEventListener('click', this.onClickHandler);
+};
+
+TVObject.prototype.onClickHandler = function(){
+    if(this.tl) this.tl.pause();
+    this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
+
+    this.onMouseDisable();
+    audioAction.click();
+    setTimeout(function(){
+        appAction.onClickMain();
+    }, 0)
+    if(appStore.curDirectory == "special") this.tvScreen.onMouseSpecialClick();
+    else                                    this.tvScreen.onMouseClick();
+
+    window.removeEventListener('click', this.onClickHandler);
+};
 
 TVObject.prototype.turnOn = function(){
     TweenMax.to(this.tvControllerMesh.rotation, 0.4, {z: Math.PI * 2/5});
@@ -98,7 +122,7 @@ TVObject.prototype.turnOn = function(){
         this.glowMat.color = new THREE.Color(0x333333);
     }.bind(this), 1000);
     this.tvScreen.turnOn();
-}
+};
 
 TVObject.prototype.onMouseEnable = function(){
     this.rayCaster.mouseEnable = true;
@@ -106,6 +130,11 @@ TVObject.prototype.onMouseEnable = function(){
 
 TVObject.prototype.onMouseDisable = function(){
     this.rayCaster.mouseEnable = false;
-}
+};
+
+TVObject.prototype.updateSpecial = function(){
+    //this.specialMat.init
+    this.tvScreen.setSpecialContent();
+};
 
 module.exports = TVObject;

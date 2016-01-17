@@ -373,6 +373,9 @@ TVScreen.prototype.setText = function(){
 
 };
 
+TVScreen.prototype.turnOff = function(){
+
+};
 
 module.exports = TVScreen;
 

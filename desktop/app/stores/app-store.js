@@ -6,7 +6,7 @@ var AppStore = function(){
     _.bindAll(this, 'onMouseOverObject', 'onMouseOutObject', 'onClickObject');
     _.bindAll(this, 'onMouseOverAboutType', 'onMouseOutAboutType', 'onGoToHome');
     _.bindAll(this, 'onMouseOverWorksType', 'onMouseOutWorksType');
-    _.bindAll(this, 'onClickWorks', 'onGoToWorks', 'onMouseOverContactType', 'onMouseOutContactType', 'onChangeAudioHandler');
+    _.bindAll(this, 'onClickWorks', 'onGoToWorks', 'onMouseOverContactType', 'onMouseOutContactType', 'onChangeAudioHandler', 'onClickMain');
 
     this._curDirectory         = 'home';
     this._isAudio = true;
@@ -25,6 +25,7 @@ var AppStore = function(){
     appAction.addEventListener(appAction.GO_TO_HOME, this.onGoToHome);
     appAction.addEventListener(appAction.GO_TO_WORKS, this.onGoToWorks);
     appAction.addEventListener(appAction.CLICK_WORKS, this.onClickWorks);
+    appAction.addEventListener(appAction.CLICK_MAIN, this.onClickMain );
 
     audioAction.addEventListener(audioAction.CHANGE_AUDIO, this.onChangeAudioHandler );
 }
@@ -49,6 +50,7 @@ AppStore.prototype.GO_TO_HOME              = 'goToHome';
 AppStore.prototype.GO_TO_WORKS             = 'goToWorks';
 AppStore.prototype.CLICK_WORKS             = "clickWorks";
 AppStore.prototype.AUDIO_CHANGED           = "audioChanged";
+AppStore.prototype.CLICK_MAIN              = "clickMain";
 
 AppStore.prototype.onMouseOverWorksType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_WORKS_TYPE});
@@ -76,6 +78,7 @@ AppStore.prototype.onMouseOutContactType = function(){
 
 AppStore.prototype.onMouseOverObject = function(ev){
     this.mouseOverProject = ev.object;
+
 
     if(this.mouseOverProject.parent.curModel && this.mouseOverProject.parent.curModel.clickable){
         document.body.style.cursor = "pointer";
@@ -118,7 +121,6 @@ AppStore.prototype.onGoToHome = function(){
 }
 
 AppStore.prototype.onGoToWorks = function(){
-    console.log('onGoToWorks');
     this.curDirectory = "works";
     this.selectedObject = null;
 
@@ -136,9 +138,20 @@ AppStore.prototype.onClickWorks = function(ev){
     this.mainMouseOverObject = null;
 };
 
+AppStore.prototype.onClickMain = function(){
+    if(this.curDirectory == "special") this.curDirectory = this.prevDirectory || "home";
+    else                               this.curDirectory = "special";
+
+    this.isTransition = true;
+    document.body.style.cursor = "default";
+    this.mouseOverProject = null;
+    this.mainMouseOverObject = null;
+
+};
+
 AppStore.prototype.onMouseDisable = function(){
     document.body.style.cursor = "default";
-}
+};
 
 Object.defineProperty(AppStore.prototype, 'isTransition', {
     get : function(){

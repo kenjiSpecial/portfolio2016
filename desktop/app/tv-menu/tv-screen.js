@@ -112,6 +112,19 @@ TVScreen.prototype.turnOn = function(){
         .to(this.tvMaterial.uniforms.uState, this.customDuration, {value: 1.0, onUpdate: this.onUpdate, delay: this.customDelay, onComplete: this.onCompleteTw1 });
 };
 
+
+TVScreen.prototype.turnOff = function(){
+    //var tl = new TimelineMax();
+    //tl.to(this.tvMaterial.uniforms.uState, 0.4, {value: 0.0 })
+    /*
+    var tl = new TimelineMax();
+    tl.to(this.tvMaterial.uniforms.uState, 0.2, {value: 0.1, ease: Quint.easeIn })
+        .to(this.tvMaterial.uniforms.uState, 0.1, {value: 0.2})
+        .to(this.tvMaterial.uniforms.uState, 0.3, {value: 0.4, onComplete: this.onCompleteTw0 })
+        .to(this.tvMaterial.uniforms.uState, this.customDuration, {value: 1.0, onUpdate: this.onUpdate, delay: this.customDelay, onComplete: this.onCompleteTw1 });
+        */
+};
+
 TVScreen.prototype.onUpdate = function(){};
 
 TVScreen.prototype.onCompleteTw0 = function(){

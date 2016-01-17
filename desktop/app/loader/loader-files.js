@@ -1,7 +1,7 @@
 module.exports = {
     models : [
         {name: 'tvData', directory: '/assets/models/tv-model.json'},
-        {name: 'tvController', directory: '/assets/models/tv-controller.json'}
+        {name: 'tvController', directory: '/assets/models/tv-controller4.json'}
     ],
     images : [
         {name: 'portrait',                  directory: '/assets/about/kenji.jpg'},
@@ -48,7 +48,10 @@ module.exports = {
         {name: 'sketchWaterPaint',          directory: '/assets/sketch/water-paint.jpg'},
         {name: 'sketchWebGlDojo',           directory: '/assets/sketch/webgl-dojo.jpg'},
         {name: 'audioOn',                   directory : '/assets/sounds/audio-on.jpg'},
-        {name: 'audioOff',                  directory : '/assets/sounds/audio-off.jpg'},
+
+        {name: 'spParticle',                directory : '/assets/special/particle2.png'},
+        {name: 'spPerlin',                directory : '/assets/special/perlin-512.png'},
+        {name: 'spBg',                directory : '/assets/special/bg.png'},
     ],
     json : [
         {name : "workData",    directory : '/assets/json/works.json'},

@@ -114,6 +114,10 @@ TVObject.prototype.onChangeDirectory = function(){
 };
 
 TVObject.prototype.setRouter = function(){
+    if(appStore.curDirectory == 'special' || appStore.prevDirectory == 'special'){
+        return;
+    }
+
     this.onMouseDisable();
 
     if(this.tlAngle) this.tlAngle.pause();
@@ -122,6 +126,8 @@ TVObject.prototype.setRouter = function(){
 
 
     //console.log(appStore.prevDirectory);
+
+
     if(appStore.prevDirectory == 'works'){
         this.worksTvScreen.stopTimer();
     }
@@ -166,6 +172,11 @@ TVObject.prototype.goToHomeInit = function(){
     //setTimeout(this.turnOn.bind(this), constants.delay.firstDelay + constants.delay.intervalDelay * ( this.col) );
     this.rayCaster.material.color = constants[this.tag].lightColor; //new THREE.Color(0xff3333);
     this.turnOnColor = constants[this.tag].lightColor;
+};
+
+TVObject.prototype.goToSpecial = function(){
+   if(appStore.prevDirectory == 'home') this.tvScreen.turnOff();
+    if(appStore.prevDirectory == 'work') this.worksTvScreen.turnOff();
 };
 
 TVObject.prototype.goToHome = function(){

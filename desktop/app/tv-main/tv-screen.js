@@ -2,10 +2,17 @@ var glslify = require('glslify');
 var CanvasRenderer = require('fontpath-canvas');
 var RobotFont = require('../utils/fonts/robot-font');
 var audioAction = require('../actions/audio-action');
+var SpecialMaterial = require('../tv-special/special01Material');
 var _ = require('underscore');
+var appStore = require('../stores/app-store');
 
 var TVScreen = function(){
-    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onCompleteTw1');
+    _.bindAll(this, 'onCompleteTw0', 'onBlink', 'onCompleteTw1', 'onTurnOffSpecial' );
+
+    this.specialMat = new SpecialMaterial();
+    this.specialMat.addEventListener("tweenComplete", this.onCompleteTw1 );
+    this.specialMat.addEventListener("turnOffSpecial", this.onTurnOffSpecial );
+    this.isSpecial  = false;
 
     this.canvasWidth = 620;
     this.canvasHeight = 540;
@@ -96,7 +103,11 @@ TVScreen.prototype = Object.create(THREE.Mesh.prototype);
 TVScreen.prototype.constructor = TVScreen;
 
 TVScreen.prototype.update = function(dt){
-    this.tvMaterial.uniforms.uTime.value += dt;
+    if(this.isSpecial){
+        this.specialMat.update(dt);
+    }else{
+        this.tvMaterial.uniforms.uTime.value += dt;
+    }
 };
 
 TVScreen.prototype.turnOn = function(){
@@ -136,15 +147,42 @@ TVScreen.prototype.onBlink = function(){
 }
 
 TVScreen.prototype.onMouseOver = function(){
+    if(this.isSpecial) return;
     this.tvMaterial.uniforms.uTime.value = 0;
     if(this.tl)this.tl.pause();
     this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 0.8, {value: 1})
 };
 
 TVScreen.prototype.onMouseOut = function(){
+    if(this.isSpecial) return;
+
     if(this.tl)this.tl.pause();
     this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 0.8, {value: 0})
     //this.tvMaterial.uniforms.uMouse.value = 0;
+};
+
+TVScreen.prototype.onMouseClick = function(){
+    if(this.tl) this.tl.pause();
+    this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 0.4, {value: 2, delay: 0.0 });
+    this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 0.4, {value: 3, delay: 1.0 });
+};
+
+TVScreen.prototype.setSpecialContent = function(){
+    this.isSpecial = true;
+    this.specialMat.reset();
+    this.material = this.specialMat;
+};
+
+TVScreen.prototype.onMouseSpecialClick = function(){
+    //this.isSpecial = false;
+    this.specialMat.turnOff();
+};
+
+TVScreen.prototype.onTurnOffSpecial = function(){
+    this.material = this.tvMaterial;
+    this.isSpecial = false;
+
+    this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 1.8, {value: 0, delay: 0.0, onComplete: this.onCompleteTw1, delay: 0.4 });
 };
 
 
