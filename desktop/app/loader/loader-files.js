@@ -49,9 +49,11 @@ module.exports = {
         {name: 'sketchWebGlDojo',           directory: '/assets/sketch/webgl-dojo.jpg'},
         {name: 'audioOn',                   directory : '/assets/sounds/audio-on.jpg'},
 
-        {name: 'spParticle',                directory : '/assets/special/particle2.png'},
-        {name: 'spPerlin',                directory : '/assets/special/perlin-512.png'},
-        {name: 'spBg',                directory : '/assets/special/bg.png'},
+        {name : 'spNoise',              directory : './assets/special/02/noise.jpg'},
+        {name : 'spParticle',           directory : './assets/special/02/particle.png'},
+        {name : 'spSnow',               directory : './assets/special/02/snow.jpg'},
+        {name : 'spSnowNormal',         directory : './assets/special/02/snow-n.jpg'},
+        {name: 'spBg',                  directory : './assets/special/02/bg.png'}
     ],
     json : [
         {name : "workData",    directory : '/assets/json/works.json'},

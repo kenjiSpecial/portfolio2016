@@ -2,7 +2,8 @@ var glslify = require('glslify');
 var CanvasRenderer = require('fontpath-canvas');
 var RobotFont = require('../utils/fonts/robot-font');
 var audioAction = require('../actions/audio-action');
-var SpecialMaterial = require('../tv-special/special01Material');
+//var SpecialMaterial = require('../tv-special/02/main-mat');
+import SpecialMaterial from '../tv-special/02/main-mat';
 var _ = require('underscore');
 var appStore = require('../stores/app-store');
 
@@ -104,7 +105,7 @@ TVScreen.prototype.constructor = TVScreen;
 
 TVScreen.prototype.update = function(dt){
     if(this.isSpecial){
-        this.specialMat.update(dt);
+        this.specialMat.onUpdate(dt, window.app.renderer);
     }else{
         this.tvMaterial.uniforms.uTime.value += dt;
     }
@@ -135,16 +136,8 @@ TVScreen.prototype.onCompleteTw1 = function(){
 };
 
 TVScreen.prototype.onBlink = function(){
-    //if(this.count % 2 == 0){
-    ////    this.tvMaterial.uniforms.uState.value = 10;
-    ////    //
-    ////}else{
-    ////    this.tvMaterial.uniforms.uState.value = this.originalValue;
-    ////}
-    ////
-    ////this.count++;
-    ////if(this.count < 3) setTimeout(this.onBlink, 50);
 }
+
 
 TVScreen.prototype.onMouseOver = function(){
     if(this.isSpecial) return;
@@ -184,6 +177,10 @@ TVScreen.prototype.onTurnOffSpecial = function(){
 
     this.tl = TweenMax.to(this.tvMaterial.uniforms.uMouse, 1.8, {value: 0, delay: 0.0, onComplete: this.onCompleteTw1, delay: 0.4 });
 };
+
+TVScreen.prototype.onMouseMove = function(mouseX, mouseY){
+    this.specialMat.onMouseMove( mouseX, mouseY );
+}
 
 
 module.exports = TVScreen;

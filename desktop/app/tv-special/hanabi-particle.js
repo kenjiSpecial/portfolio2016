@@ -53,16 +53,6 @@ var HanabiParticle = function(){
         fragmentShader: GPUParticleShader.fragmentShader
     });
 
-    
-
-
-    /**
-    this.particleNoiseTex = THREE.ImageUtils.loadTexture("assets/special/perlin-512.png");
-    this.particleNoiseTex.wrapS = this.particleNoiseTex.wrapT = THREE.RepeatWrapping;
-    */
-
-    this.particleSpriteTex = window.app.assets.texture['spParticle']; //THREE.ImageUtils.loadTexture("assets/special/particle2.png");
-    this.particleSpriteTex.wrapS = this.particleSpriteTex.wrapT = THREE.RepeatWrapping;
 
     this.particleShaderMat.defaultAttributeValues.particlePositionsStartTime = [0, 0, 0, 0];
     this.particleShaderMat.defaultAttributeValues.particleVelColSizeLife = [0, 0, 0, 0];
@@ -78,19 +68,6 @@ var HanabiParticle = function(){
         //c.position.set( )
         this.add(c);
     }
-
-    this.options = {
-        position: new THREE.Vector3(),
-        positionRandomness: .3,
-        velocity: new THREE.Vector3(),
-        velocityRandomness: .5,
-        color: 0xdddddd,
-        colorRandomness: .2,
-        turbulence: .5,
-        lifetime: 2,
-        size: 5,
-        sizeRandomness: 1
-    };
 }
 
 HanabiParticle.prototype = Object.create(THREE.Object3D.prototype);

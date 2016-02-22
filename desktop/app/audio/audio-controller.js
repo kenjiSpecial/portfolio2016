@@ -33,9 +33,9 @@ var AudioController = function(){
     //this.turnOnSound = new buzz.sound("/assets/sounds/turn.mp3");
     //this.turnOnSound.setVolume( 40 );
     this.clickSound  = new buzz.sound("/assets/sounds/click.mp3");
-    this.clickSound.setVolume( 40 );
+    this.clickSound.setVolume( 10 );
     this.mouseOverSound  = new buzz.sound("/assets/sounds/over.mp3");
-    this.mouseOverSound.setVolume( 40 );
+    this.mouseOverSound.setVolume( 10 );
     //this.transSound  = new buzz.sound("/assets/sounds/trans5.mp3");
     //this.transSound.setVolume( 70 );
 

@@ -31,4 +31,12 @@ TVScene.prototype.updateSpecial = function(){
     this.tvMainObject.updateSpecial();
 };
 
+TVScene.prototype.onMouseMove = function(mouseX, mouseY){
+    this.tvMainObject.onMouseMove(mouseX, mouseY);
+};
+
+TVScene.prototype.initSpecial = function(){
+    this.tvMainObject.initSpecial();
+};
+
 module.exports = TVScene;

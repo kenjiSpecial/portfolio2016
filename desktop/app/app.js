@@ -31,6 +31,7 @@ var renderTargetGlow, renderTarget;
 var curLookAtPos       = new THREE.Vector3();
 var curLookAtOriginPos = new THREE.Vector3();
 var tl1, tl2;
+var id;
 
 window.app = {
     assets : {
@@ -38,12 +39,14 @@ window.app = {
         texture : {},
         json    : {}
     },
+    special : {
+        texture : {}
+    },
     renderer : null
 };
 
 var mouse = new THREE.Vector2( 1000, 1000 );
 
-var stats;
 var finalcomposer;
 var noiseTexture;
 var customLoader;
@@ -79,16 +82,6 @@ function loadStart(){
 
     //controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-    stats = new Stats();
-    stats.setMode( 0 ); // 0: fps, 1: ms, 2: mb
-
-    // align top-left
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.bottom  = '30px';
-    stats.domElement.style.left = '30px';
-    stats.domElement.style.zIndex= 9999;
-
-    //document.body.appendChild( stats.domElement );
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -128,9 +121,8 @@ function onAssetsLoaded(){
     tvMenuScene.invisible()
 
 
-    setTimeout(initMain, 300);
-    setTimeout(init, 1900);
-
+    setTimeout(initMain, 0);
+    setTimeout(init, 1500);
 
     id = raf(loop);
 };
@@ -138,9 +130,6 @@ function onAssetsLoaded(){
 function initMain(){
 
     tvMainScene.start();
-    //camera.rotation
-    //camera.rotateOnAxis ( new THREE.Vector3(0, 1, 0), Math.PI/3 );
-    //tvMainScene.position
 
     var transY = 75/2;
     var ddX = 600 * Math.cos(Math.PI*1/6);
@@ -159,6 +148,13 @@ function animationCamera(){
     camera.animationRate1  = 0;
     camOriginalPosition = new THREE.Vector3();
     camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
+
+    if(appStore.curDirectory == "special"){
+        //onChangeTVPosition();
+        tvMainScene.initSpecial();
+        onInitSpecialTVPosition();
+        return;
+    }
 
     tl1 = TweenMax.to(camera, 1.5, {animationRate: 1, onUpdate: onAnimationUpdate, ease: Elastic.easeOut.config(1,1) });
     tl2 = TweenMax.to(camera, 2.2, {animationRate1: 1, onUpdate: onLookAtUpdate, ease: Elastic.easeOut.config(1, 1) });
@@ -198,18 +194,13 @@ function changeToSpecial(){
 }
 
 function initLoop(){
-    stats.begin();
-
     var dt = clock.getDelta();
     loaderScene.update( dt, renderer, customLoader );
-    stats.end();
 
     initId = raf(initLoop);
 }
 
 function loop() {
-    stats.begin();
-
     var dt = clock.getDelta();
     customRayCaster.update(mouse);
 
@@ -217,8 +208,6 @@ function loop() {
     if(tvMainScene)    tvMainScene.update(dt);
     if(tvContactScene) tvContactScene.update(dt);
     renderer.render(scene, camera);
-
-    stats.end();
 
     id = raf(loop);
 }
@@ -237,6 +226,8 @@ function onDocumentMouseMove(event){
 
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    if(tvMainScene) tvMainScene.onMouseMove(mouse.x, mouse.y);
 }
 
 var kd = keydown(['<escape>']);
@@ -281,6 +272,34 @@ function onChangeTVBasicPosition(){
     id = raf(loop);
 }
 
+function onInitSpecialTVPosition(){
+    if(tl1) tl1.pause();
+    if(tl2) tl2.pause();
+
+    var transY = 75/2 + 5;
+    var ddX = 98 * Math.cos(Math.PI*1/6);
+    var ddY = 98 * Math.sin(Math.PI*1/6);
+
+    camera.animationRate   = 0;
+    camera.animationRate1  = 0;
+    camOriginalPosition = new THREE.Vector3();
+    camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
+
+    camera.targetPosition = new THREE.Vector3(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
+    camera.targetLooAtPostion = tvMainScene.position.clone(); //camLookAtOriginalPosition.clone();
+    camera.targetLooAtPostion.y += transY; // = camLookAtOriginalPosition.clone();
+    curLookAtOriginPos = new THREE.Vector3(curLookAtPos.x, curLookAtPos.y, curLookAtPos.z);
+
+    tl1 = TweenMax.to(camera, 1.5, {animationRate: 1, ease: Quint.easeInOut, onUpdate: onAnimationUpdate1, delay: 0.2, onComplete: initCameraAnimationComplete });
+    //tl2 = TweenMax.to(camera, 15, {animationRate1: 1, onUpdate: onLookAtUpdate1, delay: 0.2, onComplete: changeToSpecial });
+}
+
+function initCameraAnimationComplete(){
+    camOriginalPosition = new THREE.Vector3(15, 30, 770);
+
+    changeToSpecial();
+}
+
 function onChangeTVPosition(){
     if(tl1) tl1.pause();
     if(tl2) tl2.pause();
@@ -288,11 +307,6 @@ function onChangeTVPosition(){
     var transY = 75/2 + 5;
     var ddX = 98 * Math.cos(Math.PI*1/6);
     var ddY = 98 * Math.sin(Math.PI*1/6);
-    /**
-    camera.position.set(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
-    camLookAtOriginalPosition = tvMainScene.position.clone()
-    camLookAtOriginalPosition.y += transY;
-    camera.lookAt(camLookAtOriginalPosition); */
 
     camera.animationRate   = 0;
     camera.animationRate1  = 0;
@@ -315,7 +329,7 @@ function onAnimationUpdate1(){
     var zz = camera.targetPosition.z * (camera.animationRate) + camOriginalPosition.z * (1 - camera.animationRate);
 
     camera.position.set(xx, yy, zz);
-    onLookAtUpdate1();
+    //onLookAtUpdate1();
 }
 
 function onLookAtUpdate1(){

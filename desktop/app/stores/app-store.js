@@ -79,7 +79,6 @@ AppStore.prototype.onMouseOutContactType = function(){
 AppStore.prototype.onMouseOverObject = function(ev){
     this.mouseOverProject = ev.object;
 
-
     if(this.mouseOverProject.parent.curModel && this.mouseOverProject.parent.curModel.clickable){
         document.body.style.cursor = "pointer";
     }else{
@@ -102,7 +101,6 @@ AppStore.prototype.onMouseOutObject = function(){
 AppStore.prototype.onClickObject = function(ev){
     this.curDirectory = ev.object.tag;
     this.selectedObject = ev.object;
-    //console.log(this.curDirectory); console.log( this.selectedObject);
 
     document.body.style.cursor = "default";
     this.mouseOverProject = null;
@@ -215,6 +213,7 @@ Object.defineProperty(AppStore.prototype, 'curDirectory', {
     },
     set : function(value){
         this.prevDirectory = this._curDirectory;
+        if(ga) ga('send', 'pageview', this._curDirectory);
         this._curDirectory = value;
 
         if(this.prevDirectory != this._curDirectory) {

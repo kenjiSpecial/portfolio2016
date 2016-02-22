@@ -54,7 +54,9 @@ CustomRaycaster.prototype.update = function(mouse){
             appAction.mouseOver(intersetcs[0].object);
         }
     }else{
-        if(appStore.mouseOverProject) appAction.mouseOut();
+        if(appStore.mouseOverProject) {
+            appAction.mouseOut();
+        }
     }
 
 }

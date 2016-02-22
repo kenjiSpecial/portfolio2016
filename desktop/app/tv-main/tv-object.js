@@ -2,6 +2,7 @@ var TVScreen = require('./tv-screen');
 var appStore = require('../stores/app-store');
 var audioAction = require('../actions/audio-action');
 var appAction   = require('../actions/app-action');
+var router = require('../utils/router');
 var _ = require('underscore')
 
 
@@ -55,6 +56,7 @@ var TVObject = function( opts ){
 
     this.scale.y = 0.01;
 
+    appStore.addEventListener(appStore.CHANGE_DIRECTORY, this.onChangeDirectory.bind(this));
 };
 
 TVObject.prototype = Object.create(THREE.Object3D.prototype);
@@ -105,13 +107,30 @@ TVObject.prototype.onClickHandler = function(){
 
     this.onMouseDisable();
     audioAction.click();
+    /**
     setTimeout(function(){
         appAction.onClickMain();
-    }, 0)
-    if(appStore.curDirectory == "special") this.tvScreen.onMouseSpecialClick();
-    else                                    this.tvScreen.onMouseClick();
+    }, 0); */
+    if(appStore.curDirectory == "special") {
+        router.navigate("/");
+    }else{
+        router.navigate("/special");
+    }
 
     window.removeEventListener('click', this.onClickHandler);
+};
+
+TVObject.prototype.onChangeDirectory = function(){
+    if(appStore.curDirectory == "special") {
+        this.tvScreen.onMouseClick();
+    }else {
+        this.tvScreen.onMouseSpecialClick();
+    }
+
+};
+
+TVObject.prototype.initSpecial = function(){
+    this.tvScreen.onMouseClick();
 };
 
 TVObject.prototype.turnOn = function(){
@@ -135,6 +154,10 @@ TVObject.prototype.onMouseDisable = function(){
 TVObject.prototype.updateSpecial = function(){
     //this.specialMat.init
     this.tvScreen.setSpecialContent();
+};
+
+TVObject.prototype.onMouseMove = function(mouseX, mouseY){
+    this.tvScreen.onMouseMove(mouseX, mouseY);
 };
 
 module.exports = TVObject;
