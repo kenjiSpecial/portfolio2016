@@ -3,7 +3,7 @@ var appStore  = require('../stores/app-store');
 
 var worldScaled = 1 / 100;
 var originVertice = new THREE.Vector3(0, 0, 0);
-var originDirection = new THREE.Vector3(0, 0.00, -5 * worldScaled);
+var originDirection = new THREE.Vector3(0,  - worldScaled, - worldScaled);
 
 function descSort( a, b ) {
 

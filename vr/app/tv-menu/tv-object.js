@@ -364,7 +364,7 @@ TVObject.prototype.onMouseOver = function(){
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.3, ease: Quint.easeOut});
     audioAction.mouseOver();
-    if(appStore.curDirectory == 'home') window.addEventListener('click', this.onClickHandler );
+    if(appStore.curDirectory == 'home') appAction.addEventListener(appAction.CLICK, this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOverAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOverWorks();
     else if(appStore.curDirectory == 'work')  this.onMouseOverWork();
@@ -376,7 +376,7 @@ TVObject.prototype.onMouseOverAbout = function(){
     this.aboutTvScreen.onMouserOver();
 
     if(this.aboutModel.clickable){
-        window.addEventListener('click', this.onClickAboutHandler );
+        appAction.addEventListener(appAction.CLICK, this.onClickAboutHandler );
     }
 };
 
@@ -384,21 +384,21 @@ TVObject.prototype.onMouseOverWorks = function(){
     this.worksTvScreen.onMouserOver();
 
     if(this.worksModel.clickable){
-        window.addEventListener('click', this.onClickWorksHandler );
+        appAction.addEventListener(appAction.CLICK, this.onClickWorksHandler );
     }
 };
 
 TVObject.prototype.onMouseOverWork = function(){
     if(this.workModel.clickable){
         this.worksTvScreen.onWorkMouseOver();
-        window.addEventListener('click', this.onClickWorkHandler);
+        appAction.addEventListener(appAction.CLICK, this.onClickWorkHandler);
     }
 };
 
 TVObject.prototype.onMouseOverContact = function(){
     if(this.contactModel.clickable){
         this.contactTVScreen.onMouserOver();
-        window.addEventListener('click', this.onClickContactHandler);
+        appAction.addEventListener(appAction.CLICK, this.onClickContactHandler);
     }
 };
 
@@ -407,7 +407,7 @@ TVObject.prototype.onMouseOverSketch = function(){
 
     if(this.sketchModel.clickable){
         this.sketchTVScreen.onMouserOver();
-        window.addEventListener('click', this.onClickSketchHandler);
+        appAction.addEventListener(appAction.CLICK, this.onClickSketchHandler);
     }
 }
 
@@ -417,7 +417,7 @@ TVObject.prototype.onMouseOut = function(){
 
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
-    if(appStore.curDirectory == 'home') window.removeEventListener('click', this.onClickHandler );
+    if(appStore.curDirectory == 'home') appAction.removeEventListener(appAction.CLICK, this.onClickHandler );
     else if(appStore.curDirectory == 'about') this.onMouseOutAbout();
     else if(appStore.curDirectory == 'works') this.onMouseOutWorks();
     else if(appStore.curDirectory == 'work' ) this.onMouseOutWork();
@@ -437,117 +437,117 @@ TVObject.prototype.onMouseOutAbout = function(){
     this.aboutTvScreen.onMouserOut();
 
     if(this.aboutModel.clickable){
-        window.removeEventListener('click', this.onClickAboutHandler );
+        appAction.removeEventListener(appAction.CLICK, this.onClickAboutHandler );
     }
 }
 
 TVObject.prototype.onMouseOutWorks = function(){
     this.worksTvScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickWorksHandler );
+    appAction.removeEventListener(appAction.CLICK, this.onClickWorksHandler );
 };
 
 TVObject.prototype.onMouseOutContact = function(){
     this.contactTVScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickContactHandler );
+    appAction.removeEventListener(appAction.CLICK, this.onClickContactHandler );
 };
 
 TVObject.prototype.onMouseOutSketch = function(){
     if(!this.curModel.type) return;
 
     this.sketchTVScreen.onMouserOut();
-    window.removeEventListener('click', this.onClickSketchHandler );
+    appAction.removeEventListener(appAction.CLICK, this.onClickSketchHandler );
 }
 
 TVObject.prototype.onMouseOutWork = function(){
     document.body.style.cursor = "default";
     if(this.workModel.clickable){
         this.worksTvScreen.onWorkMouseOut();
-        window.removeEventListener('click', this.onClickWorkHandler );
+        appAction.removeEventListener(appAction.CLICK, this.onClickWorkHandler );
     }
 
 }
 
 TVObject.prototype.onClickHandler = function(){
     appAction.clickObject(this);
-    window.removeEventListener('click', this.onClickHandler );
+    appAction.removeEventListener(appAction.CLICK, this.onClickHandler );
     audioAction.click();
 
 };
 
 TVObject.prototype.onClickWorksHandler = function(){
-    if(this.idNumber == 8){
-        var win = window.open(this.curModel.worksData.url, '_blank');
-        if(win){
-            win.focus();
-        }else{
-            //Broswer has blocked it
-            alert('Please allow popups for this site');
-        }
-    } else {
-        appAction.clickWorks(this.worksModel);
-    }
-    audioAction.click();
-    window.removeEventListener('click', this.onClickWorksHandler );
+    // if(this.idNumber == 8){
+    //     var win = window.open(this.curModel.worksData.url, '_blank');
+    //     if(win){
+    //         win.focus();
+    //     }else{
+    //         //Broswer has blocked it
+    //         alert('Please allow popups for this site');
+    //     }
+    // } else {
+    //     appAction.clickWorks(this.worksModel);
+    // }
+    // audioAction.click();
+    appAction.removeEventListener(appAction.CLICK, this.onClickWorksHandler );
 };
 
 TVObject.prototype.onClickAboutHandler = function(){
-    document.body.style.cursor = "default";
-    var win = window.open(this.aboutModel.url, '_blank');
-    if(win) win.focus();
-    else alert('Please allow popups for this site');
-
-    audioAction.click();
-    window.removeEventListener('click', this.onClickAboutHandler );
+    // document.body.style.cursor = "default";
+    // var win = window.open(this.aboutModel.url, '_blank');
+    // if(win) win.focus();
+    // else alert('Please allow popups for this site');
+    //
+    // audioAction.click();
+    appAction.removeEventListener(appAction.CLICK, this.onClickAboutHandler );
 }
 
 TVObject.prototype.onClickWorkHandler = function(){
-    document.body.style.cursor = "default";
-    var win = window.open(this.curModel.workData.url, '_blank');
-    if(win){
-        //Browser has allowed it to be opened
-        win.focus();
-    }else{
-        //Broswer has blocked it
-        alert('Please allow popups for this site');
-    }
-    audioAction.click();
-    window.removeEventListener('click', this.onClickWorkHandler );
+    // document.body.style.cursor = "default";
+    // var win = window.open(this.curModel.workData.url, '_blank');
+    // if(win){
+    //     //Browser has allowed it to be opened
+    //     win.focus();
+    // }else{
+    //     //Broswer has blocked it
+    //     alert('Please allow popups for this site');
+    // }
+    // audioAction.click();
+    appAction.removeEventListener(appAction.CLICK, this.onClickWorkHandler );
 };
 
 TVObject.prototype.onClickContactHandler = function(){
-    document.body.style.cursor = "default";
-    var win;
-
-    if(this.curModel.isMail) {
-        var mailto_link = 'mailto:' + this.curModel.url + '?subject=Hello!';
-        win = window.open(mailto_link, 'emailWindow');
-        //if (win && win.open && !win.closed) win.close();
-    }else{
-        var win = window.open(this.curModel.url, '_blank');
-        if(win){
-            //Browser has allowed it to be opened
-            win.focus();
-        }else{
-            //Broswer has blocked it
-            alert('Please allow popups for this site');
-        }
-    }
-    //url
-    audioAction.click();
-    window.removeEventListener('click', this.onClickContactHandler );
+    // document.body.style.cursor = "default";
+    // var win;
+    //
+    // if(this.curModel.isMail) {
+    //     var mailto_link = 'mailto:' + this.curModel.url + '?subject=Hello!';
+    //     win = window.open(mailto_link, 'emailWindow');
+    //     //if (win && win.open && !win.closed) win.close();
+    // }else{
+    //     var win = window.open(this.curModel.url, '_blank');
+    //     if(win){
+    //         //Browser has allowed it to be opened
+    //         win.focus();
+    //     }else{
+    //         //Broswer has blocked it
+    //         alert('Please allow popups for this site');
+    //     }
+    // }
+    // //url
+    // audioAction.click();
+    appAction.removeEventListener(appAction.CLICK, this.onClickContactHandler );
 };
 
 TVObject.prototype.onClickSketchHandler = function(){
-    var win = window.open(this.curModel.url, '_blank');
-    if(win){
-        //Browser has allowed it to be opened
-        win.focus();
-    }else{
-        //Broswer has blocked it
-        alert('Please allow popups for this site');
-    }
-    audioAction.click();
-    window.removeEventListener('click', this.onClickSketchHandler );
+    // var win = window.open(this.curModel.url, '_blank');
+    // if(win){
+    //     //Browser has allowed it to be opened
+    //     win.focus();
+    // }else{
+    //     //Broswer has blocked it
+    //     alert('Please allow popups for this site');
+    // }
+    // audioAction.click();
+    appAction.removeEventListener(appAction.CLICK, this.onClickSketchHandler );
 }
 
 TVObject.prototype.onTransitionStart = function(){
