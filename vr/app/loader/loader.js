@@ -10,7 +10,8 @@ function load(url, onLoad, name){
     var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : THREE.Loader.prototype.extractUrlBase( url );
 
     var loader = new THREE.XHRLoader( this.manager );
-    loader.setCrossOrigin( this.crossOrigin );
+
+    //loader.setCrossOrigin( this.crossOrigin );
     loader.setWithCredentials( this.withCredentials );
     loader.load( url, function ( text ) {
 
@@ -39,6 +40,8 @@ function load(url, onLoad, name){
         onLoad( object.geometry, object.materials, name );
 
     });
+
+    this.images = {}
 }
 
 var Loader = function() {
@@ -52,6 +55,7 @@ var Loader = function() {
     this.jsonLoader = new THREE.JSONLoader();
     this.jsonLoader.load = load;
     this.imageLoader = new THREE.ImageLoader();
+
 };
 
 THREE.EventDispatcher.prototype.apply( Loader.prototype );
@@ -73,7 +77,11 @@ Loader.prototype.start = function(){
         var imageFileUrl  = imageFile.directory;
         var imageFileName = imageFile.name;
         //console.log(imageFileUrl);
-        this.imageLoader.load( imageFileUrl, this.onLoadImage);
+        //this.imageLoader.load( imageFileUrl, this.onLoadImage);
+        var image = new Image();
+        image.onload = this.onLoadImage.bind(this, image, imageFileName)
+        image.src = imageFileUrl;
+
         this.fileLength++;
     }.bind(this));
 
@@ -94,6 +102,8 @@ Loader.prototype.onLoadModel = function(geometry, materials, name){
     geometry.computeVertexNormals();
     geometry.computeMorphNormals();
 
+    // console.log(materials[0]);
+    materials[0].color = new THREE.Color(0x333333);
     window.app.assets.model[name] = {geometry: geometry, material: materials[0]};
 
     this.fileCount++;
@@ -101,8 +111,11 @@ Loader.prototype.onLoadModel = function(geometry, materials, name){
     if(this.fileCount == this.fileLength) this.loaded();
 };
 
-Loader.prototype.onLoadImage = function(image){
+Loader.prototype.onLoadImage = function(image, imageFileName){
     this.fileCount++;
+
+    if(!this.images) this.images = {};
+    this.images[imageFileName] = image;
     //console.log(this.fileCount + "/" + this.fileLength);
     if(this.fileCount == this.fileLength) this.loaded();
 };
@@ -121,13 +134,15 @@ Loader.prototype.loaded = function(){
     imageFiles.forEach(function(imageFile){
         var imageFileUrl  = imageFile.directory;
         var imageFileName = imageFile.name;
-        var image = THREE.Cache.get(imageFileUrl);
+        // console.log(imageFile);
+        var image = this.images[imageFileName] //THREE.Cache.get(imageFileUrl);
+
         var texture = new THREE.Texture(image);
         texture.magFilter = texture.minFilter = THREE.LinearFilter;
         texture.needsUpdate = true;
 
         window.app.assets.texture[imageFileName] = texture;
-    });
+    }.bind(this));
 
     this.dispatchEvent({type: this.ASSETS_LOADED});
     audioAction.loaded();

@@ -13,6 +13,7 @@ var TVScreen = function(){
 
     this.tvPlane = new THREE.PlaneGeometry( 62, 54);
 
+    console.log(window.app.assets.texture.audioOn);
     this.uniforms = {
         uTime   : {type :"f", value: 0 },
         uState  : {type: "f", value: 0 },

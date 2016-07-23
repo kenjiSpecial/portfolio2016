@@ -54,6 +54,7 @@ AudioController.prototype.loaded = function(){
 AudioController.prototype.turn = function(){
     if(!appStore.isAudio) return;
 
+    console.log('turnon');
     setTimeout(function(){
         this.turnOnSound.stop()
         this.turnOnSound.play();

@@ -11,7 +11,7 @@ var TVObject = function( opts, glowObject){
     this.type = 'tvContact';
     this.tag = 'contact';
 
-    var translateY = 75/2;
+    var translateY = 0;
 
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();

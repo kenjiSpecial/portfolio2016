@@ -11,7 +11,7 @@ var TVObject = function( opts, glowObject){
     THREE.Object3D.call( this );
     this.type = 'tvContact';
 
-    var translateY = 75/2;
+    var translateY = 0;
 
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();
@@ -147,9 +147,9 @@ TVObject.prototype.onMouseOver = function(){
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.3, ease: Quint.easeOut});
 
     if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works' || appStore.curDirectory == 'sketch' || appStore.curDirectory == 'contact' ) {
-        window.addEventListener('click', this.onClickToHome );
+        appAction.addEventListener(appAction.CLICK, this.onClickToHome );
     }else if(appStore.curDirectory == 'work'){
-        window.addEventListener('click', this.onClickToWorks );
+        appAction.addEventListener(appAction.CLICK, this.onClickToWorks );
     }
 };
 
@@ -161,9 +161,9 @@ TVObject.prototype.onMouseOut = function(){
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
 
     if(appStore.curDirectory == 'about' || appStore.curDirectory == 'works' ) {
-        window.removeEventListener('click', this.onClickToHome );
+        appAction.removeEventListener(appAction.CLICK, this.onClickToHome );
     }else if(appStore.curDirectory == 'work'){
-        window.removeEventListener('click', this.onClickToWorks );
+        appAction.removeEventListener(appAction.CLICK, this.onClickToWorks );
     }
 }
 
@@ -178,7 +178,7 @@ TVObject.prototype.onClickToWorks = function(){
     this.tvScreen.onClick();
 
     appAction.goToWorks();
-    window.removeEventListener('click', this.onClickToWorks );
+    appAction.removeEventListener(appAction.CLICK, this.onClickToWorks );
 }
 
 TVObject.prototype.onClickToHome = function(){
@@ -187,7 +187,7 @@ TVObject.prototype.onClickToHome = function(){
 
     appAction.goToHome();
 
-    window.removeEventListener('click', this.onClickToHome );
+    appAction.removeEventListener(appAction.CLICK, this.onClickToHome );
 };
 
 TVObject.prototype.onTransitionStart = function(){

@@ -22,6 +22,7 @@ AppAction.prototype.MOUSE_OVER_SKETCH_TYPE   = 'mouseOverSketchType';
 AppAction.prototype.MOUSE_OUT_SKETCH_TYPE    = 'mouseOverSketchType';
 AppAction.prototype.CLICK_WORKS              = "clickWorks";
 AppAction.prototype.CLICK_MAIN               = "clickMain";
+AppAction.prototype.CLICK                    = 'click'
 
 AppAction.prototype.onMouseOverAboutType = function(){
     this.dispatchEvent({type: this.MOUSE_OVER_ABOUT_TYPE})
@@ -81,6 +82,11 @@ AppAction.prototype.goToWorks = function(){
 
 AppAction.prototype.onClickMain = function(){
     this.dispatchEvent({ type: this.CLICK_MAIN });
+};
+
+AppAction.prototype.onClick = function () {
+    console.log('appaction click');
+    this.dispatchEvent({type: this.CLICK});
 };
 
 var appAction = new AppAction();

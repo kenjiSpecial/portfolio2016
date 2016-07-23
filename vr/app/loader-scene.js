@@ -7,7 +7,7 @@ var LoaderScene = function( renderer ){
     this.renderer = renderer;
 
     this.camera =  new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10000 );
-    this.camera.position.z = 10000;
+    this.camera.position.z = 300;
 
     this.uniforms = {
         uTime   : {type :"f", value: 0.1 },
@@ -26,7 +26,7 @@ var LoaderScene = function( renderer ){
     this.uniforms.uWindow.value.x = window.innerWidth;
     this.uniforms.uWindow.value.y = window.innerHeight;
 
-    var plane = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+    var plane = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight * 2);
     var mesh = new THREE.Mesh(plane, this.tvMaterial);
     this.mesh = mesh;
     this.add(mesh)

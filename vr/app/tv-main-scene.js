@@ -11,9 +11,13 @@ var TVScene = function(  ){
 
     customRayCaster.setObject(this.tvMainObject.rayCaster);
 
-    this.rotateOnAxis ( new THREE.Vector3(0, 1, 0), Math.PI/3 )
-    this.position.set( -150, -77 , 300);
+    // this.rotateOnAxis ( new THREE.Vector3(0, 1, 0), Math.PI/3 )
+    // this.position.set( -150, -77 , 300);
 
+    this.scale.set(window.app.scale, window.app.scale, window.app.scale);
+
+    this.position.set( -290 * window.app.scale, -77 * window.app.scale, -340 * window.app.scale);
+    this.lookAt(new THREE.Vector3(0, -77 * window.app.scale, 0));
 };
 
 TVScene.prototype = Object.create(THREE.Object3D.prototype);

@@ -28,8 +28,8 @@ var TVObject = function( opts, tvScreen ){
     this.idNumber = this.row * 3 + this.col;
     this.tag = constants.types[this.row];
 
-    var translateY = 75/2;
-
+    var translateY =  0;
+    
     //console.log(window.app.assets.model.tvData.geometry.clone());
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();

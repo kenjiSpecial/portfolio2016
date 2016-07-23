@@ -74,7 +74,7 @@ var EarthSnow = function(){
         side : THREE.DoubleSide,
         transparent : true
     });
-    this.shaderMat.derivatives = true;
+    this.shaderMat.extensions.derivatives = true;
 
     THREE.Mesh.call( this, this.geo, this.shaderMat );
     this.rotation.x = -Math.PI/2;

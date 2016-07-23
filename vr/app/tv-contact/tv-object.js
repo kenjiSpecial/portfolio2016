@@ -11,7 +11,7 @@ var TVObject = function( opts, glowObject){
     this.type = 'tvContact';
     this.tag = 'contact';
 
-    var translateY = 75/2;
+    var translateY = 0;
 
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();
@@ -97,6 +97,7 @@ TVObject.prototype.onMainMouseOverObjectUpdated = function(){
 
 TVObject.prototype.onMouseOver = function(){
     audioAction.mouseOver();
+    console.log('over');
 
     this.tvScreen.onMouseOver();
     if(this.tl) this.tl.pause();
@@ -107,7 +108,7 @@ TVObject.prototype.onMouseOver = function(){
     }else if(appStore.curDirectory == 'works'){
         appAction.onMouseOverWorksType();
     }else if(appStore.curDirectory == 'home'){
-        window.addEventListener('click', this.onClickContact);
+        appAction.addEventListener(appAction.CLICK, this.onClickContact);
     }else if(appStore.curDirectory == 'contact'){
         appAction.onMouseOverContactType();
     }else if(appStore.curDirectory == "sketch"){
@@ -117,6 +118,7 @@ TVObject.prototype.onMouseOver = function(){
 
 TVObject.prototype.onMouseOut = function(){
     this.tvScreen.onMouseOut();
+    console.log('out');
     if(this.tl) this.tl.pause();
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
 
@@ -125,7 +127,7 @@ TVObject.prototype.onMouseOut = function(){
     }else if(appStore.curDirectory == 'works'){
         appAction.onMouseOutWorksType();
     }else if(appStore.curDirectory == 'home'){
-        window.removeEventListener('click', this.onClickContact);
+        appAction.removeEventListener(appAction.CLICK, this.onClickContact);
     }else if(appStore.curDirectory == 'contact'){
         appAction.onMouseOutContactType();
     }else if(appStore.curDirectory == "sketch"){
@@ -190,6 +192,7 @@ TVObject.prototype.goToSpecial = function(){
 };
 
 TVObject.prototype.onClickContact = function(){
+    console.log('onClickContact');
     this.isClick = true;
     appAction.clickObject(this);
     audioAction.click();
@@ -197,7 +200,7 @@ TVObject.prototype.onClickContact = function(){
         audioAction.trans();
     }, 900);
 
-    window.removeEventListener('click', this.onClickContact );
+    //appAction.removeEventListener(appAction.CLICK, this.onClickContact );
 };
 
 TVObject.prototype.onMouseEnable = function(){

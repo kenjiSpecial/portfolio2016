@@ -13,7 +13,7 @@ var TVObject = function( opts ){
 
     this.type = 'tvMain';
 
-    var translateY = 75/2;
+    var translateY = 0;
 
     this.tvGeometry = window.app.assets.model.tvData.geometry;
     this.tvMaterial = window.app.assets.model.tvData.material.clone();
@@ -89,7 +89,8 @@ TVObject.prototype.onMouseOver = function(){
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.2, ease: Quint.easeOut});
     this.tvScreen.onMouseOver();
 
-    window.addEventListener('click', this.onClickHandler);
+    // window.addEventListener('click', this.onClickHandler);
+    // appAction.addEventListener(appAction.CLICK, this.onClickHandler);
 };
 
 TVObject.prototype.onMouseOut = function(){
@@ -98,7 +99,9 @@ TVObject.prototype.onMouseOut = function(){
     this.tl = TweenMax.to(this.rayCaster.material, 0.6, {opacity: 0.01, ease: Quint.easeOut});
     this.tvScreen.onMouseOut();
 
-    window.removeEventListener('click', this.onClickHandler);
+    // window.removeEventListener('click', this.onClickHandler);
+    // appAction.removeEventListener(appAction.CLICK, this.onClickHandler);
+
 };
 
 TVObject.prototype.onClickHandler = function(){
@@ -117,7 +120,8 @@ TVObject.prototype.onClickHandler = function(){
         router.navigate("/special");
     }
 
-    window.removeEventListener('click', this.onClickHandler);
+    // window.removeEventListener('click', this.onClickHandler);
+    // appAction.removeEventListener(appAction.CLICK, this.onClickHandler);
 };
 
 TVObject.prototype.onChangeDirectory = function(){

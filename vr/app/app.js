@@ -18,12 +18,18 @@ var loaderScene;
 var CustomLoader     = require('./loader/loader');
 
 var raf = require('raf');
+
+const WEBVR = require('../vendors/webvr/WebVR');
+
+var appAction = require('./actions/app-action');
+
+var appStore =require('./stores/app-store');
 var scene = new THREE.Scene();
 var glowscene = new THREE.Scene();
-var controls, renderer;
+var controls, renderer, effect;
 var camera, camOriginalPosition, camLookAtOriginalPosition;
 
-var audioController = require('./audio/audio-controller');
+// var audioController = require('./audio/audio-controller');
 
 var tvMenuScene, tvMainScene, tvContactScene, tvIndicatorScene;
 var clock;
@@ -32,6 +38,29 @@ var curLookAtPos       = new THREE.Vector3();
 var curLookAtOriginPos = new THREE.Vector3();
 var tl1, tl2;
 var id;
+
+var ViveController = require('../vendors/webvr/custom-three-vive-controller/index')(THREE, './');
+
+var worldScaled = 1/100;
+
+var lineGeo = new THREE.Geometry();
+lineGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+lineGeo.vertices.push(new THREE.Vector3(0, 0.00, -5 * worldScaled));
+var controlLine = new THREE.Line(lineGeo, new THREE.MeshBasicMaterial({color: 0xaaaaaa, side : THREE.DoubleSide}));
+
+const glslify = require('glslify');
+
+
+var clock = new THREE.Clock();
+var scene, camera, room, controls, container, renderer, controller1, controller2, effect;
+var scaled = 1/100;
+
+var customLoader;
+var initId;
+var cameraParentObject;
+
+var LoaderScene      = require('./loader-scene');
+
 
 window.app = {
     assets : {
@@ -42,54 +71,80 @@ window.app = {
     special : {
         texture : {}
     },
+    scale : 1/300,
     renderer : null
 };
 
-var mouse = new THREE.Vector2( 1000, 1000 );
+require('domready')(function () {
+    init();
+    // loop();
+});
 
-var finalcomposer;
-var noiseTexture;
-var customLoader;
-var renderModelGlow;
-var glowcomposer;
-var initId, specialId;
 
-function loadStart(){
-    var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
-    renderTargetGlow = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
-    renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, .15);
+function init() {
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+    scene.add( camera );
+    window.app.camera = camera;
+
+    room = new THREE.Mesh(
+        new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+        new THREE.MeshBasicMaterial( {  color: 0x404040, wireframe: true, opacity : 0.4, transparent : true } )
+    );
+
+
+    // scene.add( room );
+
+    scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setClearColor( 0x000000 );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.sortObjects = false;
+    container.appendChild( renderer.domElement );
+
+    controls = new THREE.VRControls( camera );
+    controls.standing = true;
+
+    controller1 = new ViveController(0, controls);
+    scene.add(controller1);
+    controller1.on(controller1.TriggerClicked, () => {
+        appAction.onClick();
+    })
+
+
+    controller2 = new ViveController(1, controls);
+    scene.add(controller2);
+    effect = new THREE.VREffect(renderer);
+
+    if (WEBVR.isAvailable() === true) {
+        document.body.appendChild(WEBVR.getButton(effect));
+    }
+
+    scene.add(controlLine)
+
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    loadStart();
+}
+
+function loadStart() {
+    var directionalLight = new THREE.DirectionalLight(0xffffff);
     directionalLight.position.set( 0, 100, 120);
     scene.add(directionalLight);
     window.app.scene = scene;
-
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
-    //camera.position.set( 15, 30, 770);
-    //camera.lookAt(new THREE.Vector3(50, 0, 0));
-    customRayCaster.setCamera(camera);
-    window.app.camera = camera;
-
-    renderer = new THREE.WebGLRenderer({alpha: true, antialias: true    });
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    window.app.renderer = renderer;
-
-    document.body.appendChild(renderer.domElement);
-
-
-    //renderModelGlow = new THREE.RenderPass( glowscene, glowcamera );
-
-    //controls = new THREE.TrackballControls(camera, renderer.domElement);
-
-
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
     loaderScene = new LoaderScene(renderer);
     loaderScene.start();
 
     customLoader = new CustomLoader();
-    //customLoader.addEventListener(customLoader.ASSETS_LOADED, onAssetsLoaded);
     loaderScene.addEventListener('loaded', onAssetsLoaded);
 
     setTimeout(function(){
@@ -103,244 +158,105 @@ function loadStart(){
     raf(initLoop);
 }
 
-function onAssetsLoaded(){
-    raf.cancel(initId);
+function onWindowResize() {
 
-    tvMenuScene = new TVMenuScene();
-    scene.add(tvMenuScene);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-    tvContactScene = new TVContactScene();
-    scene.add(tvContactScene);
+    effect.setSize(window.innerWidth, window.innerHeight);
+}
 
-    tvMainScene = new TVMainScene();
-    scene.add(tvMainScene);
-
-
-    renderer.render(scene, camera);
-    tvContactScene.invisible();
-    tvMenuScene.invisible()
-
-
-    setTimeout(initMain, 0);
-    setTimeout(init, 1500);
-
+function loop() {
     id = raf(loop);
-};
+    var dt = clock.getDelta();
 
-function initMain(){
+    controls.update();
+    cameraParentObject.position.copy(camera.position)
 
-    tvMainScene.start();
+    customRayCaster.update(controller1, controller2, controlLine, room);
 
-    var transY = 75/2;
-    var ddX = 600 * Math.cos(Math.PI*1/6);
-    var ddY = 600 * Math.sin(Math.PI*1/6);
-    camera.position.set(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
-    camLookAtOriginalPosition = tvMainScene.position.clone()
-    camLookAtOriginalPosition.y += transY;
-    camera.lookAt(camLookAtOriginalPosition);
+    if(tvMainScene)    tvMainScene.update(dt);
+    if(tvContactScene) tvContactScene.update(dt);
+    if(tvMenuScene) tvMenuScene.update(dt);
 
-    setTimeout(animationCamera, 1600);
-}
-
-
-function animationCamera(){
-    camera.animationRate   = 0;
-    camera.animationRate1  = 0;
-    camOriginalPosition = new THREE.Vector3();
-    camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
-
-    if(appStore.curDirectory == "special"){
-        //onChangeTVPosition();
-        tvMainScene.initSpecial();
-        onInitSpecialTVPosition();
-        return;
-    }
-
-    tl1 = TweenMax.to(camera, 1.5, {animationRate: 1, onUpdate: onAnimationUpdate, ease: Elastic.easeOut.config(1,1) });
-    tl2 = TweenMax.to(camera, 2.2, {animationRate1: 1, onUpdate: onLookAtUpdate, ease: Elastic.easeOut.config(1, 1) });
-}
-
-function onAnimationUpdate() {
-    var curPosition = new THREE.Vector3();
-    var xx = 15 * (camera.animationRate) + camOriginalPosition.x * (1 - camera.animationRate);
-    var yy = 30 * (camera.animationRate) + camOriginalPosition.y * (1 - camera.animationRate);
-    var zz = 770 * (camera.animationRate) + camOriginalPosition.z * (1 - camera.animationRate);
-
-    camera.position.set(xx, yy, zz);
-    onLookAtUpdate();
-}
-
-function onLookAtUpdate(){
-    var lookxx = 50 * (camera.animationRate1) + camLookAtOriginalPosition.x * (1-camera.animationRate1);;
-    var lookyy = 37.5 * (camera.animationRate1) + camLookAtOriginalPosition.y * (1-camera.animationRate1);
-    var lookzz = camLookAtOriginalPosition.z * (1-camera.animationRate1);
-
-    curLookAtPos.set(lookxx, lookyy, lookzz);
-
-    camera.lookAt(new THREE.Vector3(lookxx, lookyy, lookzz));
-}
-
-function init() {
-    tvMenuScene.start();
-    tvContactScene.start();
-    //raf(loop);
-}
-
-function changeToSpecial(){
-    raf.cancel(id);
-    tvMainScene.updateSpecial();
-
-    raf(specialLoop);
+    effect.render(scene, camera);
 }
 
 function initLoop(){
     var dt = clock.getDelta();
-    loaderScene.update( dt, renderer, customLoader );
+    controls.update();
+
+
+    loaderScene.update( dt, effect , customLoader );
 
     initId = raf(initLoop);
 }
 
-function loop() {
-    var dt = clock.getDelta();
-    customRayCaster.update(mouse);
+function onAssetsLoaded(){
+    raf.cancel(initId);
 
-    if(tvContactScene) tvMenuScene.update(dt);
-    if(tvMainScene)    tvMainScene.update(dt);
-    if(tvContactScene) tvContactScene.update(dt);
-    renderer.render(scene, camera);
+    cameraParentObject = new THREE.Object3D();
 
-    id = raf(loop);
-}
 
-function specialLoop(){
-    var dt = clock.getDelta();
-    if(tvMainScene)    tvMainScene.update(dt);
-    customRayCaster.update(mouse);
-    renderer.render(scene, camera);
+    tvMenuScene = new TVMenuScene();
+    cameraParentObject.add(tvMenuScene);
 
-    id = raf(specialLoop);
-}
+    tvContactScene = new TVContactScene();
+    cameraParentObject.add(tvContactScene);
+    //
+    tvMainScene = new TVMainScene();
+    cameraParentObject.add(tvMainScene);
 
-function onDocumentMouseMove(event){
-    event.preventDefault();
+    // var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    // for(var ii = 0; ii < 80; ii++){
+    //     var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+    //
+    //     object.position.x = (Math.random() * 4 - 2)/3;
+    //     object.position.y = (Math.random() * 4 - 2)/3;
+    //     object.position.z = (Math.random() * 4 - 2)/3;
+    //
+    //     object.rotation.x = Math.random() * 2 * Math.PI;
+    //     object.rotation.y = Math.random() * 2 * Math.PI;
+    //     object.rotation.z = Math.random() * 2 * Math.PI;
+    //
+    //     // var randomScale = 1 + Math.random();
+    //     // object.scale.set(randomScale, randomScale, randomScale);
+    //
+    //     cameraParentObject.add(object);
+    //     // cubeArr.push(object);
+    // }
+    cameraParentObject.add(room);
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    scene.add(cameraParentObject);
 
-    if(tvMainScene) tvMainScene.onMouseMove(mouse.x, mouse.y);
-}
+    cameraParentObject.position.copy(camera.position)
 
-var kd = keydown(['<escape>']);
+    setTimeout(initMain, 0);
 
-kd.on('pressed', function() {
-    // control + a are both pressed right now
-    //console.log(clock);
-    if(clock.running){
-        raf.cancel(id);
-        clock.stop();
-    }else{
-        clock.start();
-        raf(loop);
-    }
+    id = raf(loop)
 
-});
-
-function resize(){
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
 };
 
+
 function onChangeDirectory() {
-    if(appStore.curDirectory == 'special'){
-        onChangeTVPosition();
-        return;
-    }
-
-    if(appStore.prevDirectory == 'special'){
-        setTimeout(onChangeTVBasicPosition, 0)
-        return;
-    }
 
 }
 
-function onChangeTVBasicPosition(){
-    tl1 = TweenMax.to(camera, 0.6, {animationRate: 0, onUpdate: onAnimationUpdate1, delay: 0.2 });
-    tl2 = TweenMax.to(camera, 1.5, {animationRate1: 0, onUpdate: onLookAtUpdate1, ease: Elastic.easeOut.config(1, 0.7), delay: 0.2 });
+function initMain(){
 
-    raf.cancel(id);
-    id = raf(loop);
+    //tvMainScene.start();
+    tvMenuScene.start();
+    tvContactScene.start();
+    tvMainScene.start();
+
+    // var transY = 75/2;
+    // var ddX = 600 * Math.cos(Math.PI*1/6);
+    // var ddY = 600 * Math.sin(Math.PI*1/6);
+    // camera.position.set(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
+    // camLookAtOriginalPosition = tvMainScene.position.clone()
+    // camLookAtOriginalPosition.y += transY;
+    // camera.lookAt(camLookAtOriginalPosition);
+    //
+    // setTimeout(animationCamera, 1600);
 }
 
-function onInitSpecialTVPosition(){
-    if(tl1) tl1.pause();
-    if(tl2) tl2.pause();
-
-    var transY = 75/2 + 5;
-    var ddX = 98 * Math.cos(Math.PI*1/6);
-    var ddY = 98 * Math.sin(Math.PI*1/6);
-
-    camera.animationRate   = 0;
-    camera.animationRate1  = 0;
-    camOriginalPosition = new THREE.Vector3();
-    camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
-
-    camera.targetPosition = new THREE.Vector3(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
-    camera.targetLooAtPostion = tvMainScene.position.clone(); //camLookAtOriginalPosition.clone();
-    camera.targetLooAtPostion.y += transY; // = camLookAtOriginalPosition.clone();
-    curLookAtOriginPos = new THREE.Vector3(curLookAtPos.x, curLookAtPos.y, curLookAtPos.z);
-
-    tl1 = TweenMax.to(camera, 1.5, {animationRate: 1, ease: Quint.easeInOut, onUpdate: onAnimationUpdate1, delay: 0.2, onComplete: initCameraAnimationComplete });
-    //tl2 = TweenMax.to(camera, 15, {animationRate1: 1, onUpdate: onLookAtUpdate1, delay: 0.2, onComplete: changeToSpecial });
-}
-
-function initCameraAnimationComplete(){
-    camOriginalPosition = new THREE.Vector3(15, 30, 770);
-
-    changeToSpecial();
-}
-
-function onChangeTVPosition(){
-    if(tl1) tl1.pause();
-    if(tl2) tl2.pause();
-
-    var transY = 75/2 + 5;
-    var ddX = 98 * Math.cos(Math.PI*1/6);
-    var ddY = 98 * Math.sin(Math.PI*1/6);
-
-    camera.animationRate   = 0;
-    camera.animationRate1  = 0;
-    camOriginalPosition = new THREE.Vector3();
-    camOriginalPosition.set(camera.position.x, camera.position.y, camera.position.z);
-
-    camera.targetPosition = new THREE.Vector3(tvMainScene.position.x + ddX, tvMainScene.position.y + transY, tvMainScene.position.z  + ddY)
-    camera.targetLooAtPostion = tvMainScene.position.clone(); //camLookAtOriginalPosition.clone();
-    camera.targetLooAtPostion.y += transY; // = camLookAtOriginalPosition.clone();
-    curLookAtOriginPos = new THREE.Vector3(curLookAtPos.x, curLookAtPos.y, curLookAtPos.z);
-
-    tl1 = TweenMax.to(camera, 0.6, {animationRate: 1, onUpdate: onAnimationUpdate1, delay: 0.2 });
-    tl2 = TweenMax.to(camera, 1.5, {animationRate1: 1, onUpdate: onLookAtUpdate1, ease: Elastic.easeOut.config(1, 0.7), delay: 0.2, onComplete: changeToSpecial });
-}
-
-function onAnimationUpdate1(){
-    var curPosition = new THREE.Vector3();
-    var xx = camera.targetPosition.x * (camera.animationRate) + camOriginalPosition.x * (1 - camera.animationRate);
-    var yy = camera.targetPosition.y * (camera.animationRate) + camOriginalPosition.y * (1 - camera.animationRate);
-    var zz = camera.targetPosition.z * (camera.animationRate) + camOriginalPosition.z * (1 - camera.animationRate);
-
-    camera.position.set(xx, yy, zz);
-    //onLookAtUpdate1();
-}
-
-function onLookAtUpdate1(){
-    var lookxx = camera.targetLooAtPostion.x * (camera.animationRate1) + curLookAtOriginPos.x * (1-camera.animationRate1);;
-    var lookyy = camera.targetLooAtPostion.y * (camera.animationRate1) + curLookAtOriginPos.y * (1-camera.animationRate1);
-    var lookzz = camera.targetLooAtPostion.z * (camera.animationRate1) + curLookAtOriginPos.z * (1-camera.animationRate1);
-
-    curLookAtPos.set(lookxx, lookyy, lookzz);
-
-    camera.lookAt(new THREE.Vector3(lookxx, lookyy, lookzz));
-}
-
-loadStart();
-window.addEventListener('resize', resize);

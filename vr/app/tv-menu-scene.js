@@ -18,8 +18,12 @@ var TVScene = function( ){
     }
 
 
-    this.rotateOnAxis ( new THREE.Vector3(0, 1, 0), -Math.PI/6);
-    this.position.set( 60, 0, 280);
+    // this.rotateOnAxis ( new THREE.Vector3(0, 1, 0), -Math.PI/6);
+    this.scale.set(window.app.scale, window.app.scale, window.app.scale);
+
+    this.position.set( -100 * window.app.scale, 0, -380 * window.app.scale);
+    // window.position = this.position;
+    // window.obj = this;
 
 };
 
@@ -27,7 +31,6 @@ TVScene.prototype = Object.create(THREE.Object3D.prototype);
 TVScene.prototype.constructor = TVScene.prototype;
 
 TVScene.prototype.update = function(dt){
-
     this.tvArr.forEach(function(tvObject){
         tvObject.update(dt);
     });

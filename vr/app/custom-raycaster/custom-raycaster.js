@@ -1,6 +1,10 @@
 var appAction = require('../actions/app-action');
 var appStore  = require('../stores/app-store');
 
+var worldScaled = 1 / 100;
+var originVertice = new THREE.Vector3(0, 0, 0);
+var originDirection = new THREE.Vector3(0, 0.00, -5 * worldScaled);
+
 function descSort( a, b ) {
 
     return a.distance - b.distance;
@@ -42,21 +46,48 @@ CustomRaycaster.prototype.setCamera = function(camera){
     this.camera = camera;
 };
 
-CustomRaycaster.prototype.update = function(mouse){
+CustomRaycaster.prototype.setControls = function (controls) {
+    this.controls = controls;
+};
 
-    this.setFromCamera(mouse, this.camera);
+CustomRaycaster.prototype.update = function(controller1, controller2, line1, room){
 
-    var intersetcs = this.intersectObjects(this.objects);
-    //|| !object.mouseEnable
+    //this.setFromCamera(mouse, this.camera);
+    var transformedOriginVertice = new THREE.Vector3().copy(originVertice).applyMatrix4(controller1.matrix);
+    var direction = new THREE.Vector3().copy(originDirection).applyMatrix4(controller1.matrix);
+    var directionNormalizedVec = new THREE.Vector3().copy(direction).sub(transformedOriginVertice).normalize();
+
+    this.set( transformedOriginVertice, directionNormalizedVec );
+    var intersetcs = this.intersectObjects(this.objects, false);
+
     if(intersetcs.length > 0 && intersetcs[0].object.mouseEnable ){
-
         if( intersetcs[0].object && intersetcs[0].object != appStore.mouseOverProject ){
             appAction.mouseOver(intersetcs[0].object);
         }
+
     }else{
         if(appStore.mouseOverProject) {
+            console.log('mouseOut');
             appAction.mouseOut();
         }
+    }
+
+    if(intersetcs.length > 0){
+        line1.geometry.vertices[0] = transformedOriginVertice;
+        line1.geometry.vertices[1] = intersetcs[0].point;
+
+        line1.geometry.verticesNeedUpdate = true;
+        line1.frustumCulled = false;
+        line1.visible = true;
+    }else{
+
+
+        line1.geometry.vertices[0] = transformedOriginVertice;
+        line1.geometry.vertices[1] = transformedOriginVertice.clone().addScaledVector(directionNormalizedVec, 3);
+
+        line1.geometry.verticesNeedUpdate = true;
+        line1.frustumCulled = false;
+        line1.visible = true;
     }
 
 }
