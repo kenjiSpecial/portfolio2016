@@ -200,7 +200,7 @@ TVObject.prototype.onClickContact = function(){
         audioAction.trans();
     }, 900);
 
-    //appAction.removeEventListener(appAction.CLICK, this.onClickContact );
+    appAction.removeEventListener(appAction.CLICK, this.onClickContact );
 };
 
 TVObject.prototype.onMouseEnable = function(){

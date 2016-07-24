@@ -90,7 +90,6 @@ window.app = {
 
 require('domready')(function () {
     if (WEBVR.isAvailable() === true) {
-        document.body.appendChild(WEBVR.getButton(effect));
         init();
     }else{
 
@@ -144,6 +143,7 @@ function init() {
     scene.add(controlLine)
 
 
+    document.body.appendChild(WEBVR.getButton(effect));
 
     window.addEventListener('resize', onWindowResize, false);
 

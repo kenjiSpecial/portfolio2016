@@ -85,7 +85,6 @@ AppAction.prototype.onClickMain = function(){
 };
 
 AppAction.prototype.onClick = function () {
-    console.log('appaction click');
     this.dispatchEvent({type: this.CLICK});
 };
 

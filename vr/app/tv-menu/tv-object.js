@@ -370,6 +370,7 @@ TVObject.prototype.onMouseOver = function(){
     else if(appStore.curDirectory == 'work')  this.onMouseOverWork();
     else if(appStore.curDirectory == 'contact')  this.onMouseOverContact();
     else if(appStore.curDirectory == 'sketch') this.onMouseOverSketch();
+
 };
 
 TVObject.prototype.onMouseOverAbout = function(){
@@ -382,6 +383,7 @@ TVObject.prototype.onMouseOverAbout = function(){
 
 TVObject.prototype.onMouseOverWorks = function(){
     this.worksTvScreen.onMouserOver();
+
 
     if(this.worksModel.clickable){
         appAction.addEventListener(appAction.CLICK, this.onClickWorksHandler );
@@ -484,9 +486,11 @@ TVObject.prototype.onClickWorksHandler = function(){
     //         alert('Please allow popups for this site');
     //     }
     // } else {
-    //     appAction.clickWorks(this.worksModel);
+    //
     // }
     // audioAction.click();
+
+    appAction.clickWorks(this.worksModel);
     appAction.removeEventListener(appAction.CLICK, this.onClickWorksHandler );
 };
 
@@ -528,7 +532,7 @@ TVObject.prototype.onClickContactHandler = function(){
     //         //Browser has allowed it to be opened
     //         win.focus();
     //     }else{
-    //         //Broswer has blocked it
+    //         //Broswer has blocked it374
     //         alert('Please allow popups for this site');
     //     }
     // }
