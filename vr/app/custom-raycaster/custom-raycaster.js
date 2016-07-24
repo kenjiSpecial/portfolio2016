@@ -50,7 +50,7 @@ CustomRaycaster.prototype.setControls = function (controls) {
     this.controls = controls;
 };
 
-CustomRaycaster.prototype.update = function(controller1, controller2, line1, room){
+CustomRaycaster.prototype.update = function(controller1, controller2, line1, room, selectionMesh){
 
     //this.setFromCamera(mouse, this.camera);
     var transformedOriginVertice = new THREE.Vector3().copy(originVertice).applyMatrix4(controller1.matrix);
@@ -65,11 +65,18 @@ CustomRaycaster.prototype.update = function(controller1, controller2, line1, roo
             appAction.mouseOver(intersetcs[0].object);
         }
 
+        if(intersetcs[0].object.mouseEnable){
+            selectionMesh.visible = true;
+        }else{
+            selectionMesh.visible = false;
+        }
+
     }else{
         if(appStore.mouseOverProject) {
-            console.log('mouseOut');
             appAction.mouseOut();
         }
+
+        selectionMesh.visible = false;
     }
 
     if(intersetcs.length > 0){
@@ -79,15 +86,18 @@ CustomRaycaster.prototype.update = function(controller1, controller2, line1, roo
         line1.geometry.verticesNeedUpdate = true;
         line1.frustumCulled = false;
         line1.visible = true;
+
+        var pt = intersetcs[0].point.clone().sub(transformedOriginVertice).multiplyScalar(0.95).add(transformedOriginVertice);
+        selectionMesh.position.copy(pt);
+
     }else{
-
-
         line1.geometry.vertices[0] = transformedOriginVertice;
         line1.geometry.vertices[1] = transformedOriginVertice.clone().addScaledVector(directionNormalizedVec, 3);
 
         line1.geometry.verticesNeedUpdate = true;
         line1.frustumCulled = false;
         line1.visible = true;
+
     }
 
 }

@@ -4,6 +4,7 @@
 
 var customRayCaster = require('./custom-raycaster/custom-raycaster');
 var keydown = require('keydown');
+const glslify = require('glslify');
 
 var TVMenuScene      = require('./tv-menu-scene');
 var TVMainScene      = require('./tv-main-scene');
@@ -48,12 +49,24 @@ lineGeo.vertices.push(new THREE.Vector3(0, 0, 0));
 lineGeo.vertices.push(new THREE.Vector3(0, 0.00, -5 * worldScaled));
 var controlLine = new THREE.Line(lineGeo, new THREE.MeshBasicMaterial({color: 0xaaaaaa, side : THREE.DoubleSide}));
 
-const glslify = require('glslify');
-
 
 var clock = new THREE.Clock();
 var scene, camera, room, controls, container, renderer, controller1, controller2, effect;
 var scaled = 1/100;
+var selectionPlane = new THREE.PlaneBufferGeometry(8 * worldScaled, 8 * worldScaled);
+var selectionMat = new THREE.ShaderMaterial({
+    vertexShader: glslify('./circle/shader.vert'),
+    fragmentShader: glslify('./circle/shader.frag'),
+    side: THREE.DoubleSide,
+    transparent: true,
+    blending : THREE.AdditiveBlending
+})
+var mat = new THREE.MeshBasicMaterial({
+    color : 0x0000ff,
+    side : THREE.DoubleSide
+})
+
+var selectionMesh = new THREE.Mesh(selectionPlane, selectionMat);
 
 var customLoader;
 var initId;
@@ -76,7 +89,13 @@ window.app = {
 };
 
 require('domready')(function () {
-    init();
+    if (WEBVR.isAvailable() === true) {
+        document.body.appendChild(WEBVR.getButton(effect));
+        init();
+    }else{
+
+    }
+
     // loop();
 });
 
@@ -97,8 +116,6 @@ function init() {
         new THREE.MeshBasicMaterial( {  color: 0x404040, wireframe: true, opacity : 0.4, transparent : true } )
     );
 
-
-    // scene.add( room );
 
     scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
@@ -123,11 +140,9 @@ function init() {
     scene.add(controller2);
     effect = new THREE.VREffect(renderer);
 
-    if (WEBVR.isAvailable() === true) {
-        document.body.appendChild(WEBVR.getButton(effect));
-    }
 
     scene.add(controlLine)
+
 
 
     window.addEventListener('resize', onWindowResize, false);
@@ -168,13 +183,16 @@ function onWindowResize() {
 
 function loop() {
     id = raf(loop);
+
     var dt = clock.getDelta();
 
     controls.update();
     cameraParentObject.position.copy(camera.position)
 
-    customRayCaster.update(controller1, controller2, controlLine, room);
+    customRayCaster.update(controller1, controller2, controlLine, room, selectionMesh);
 
+    controlLine.visible = controller1.visible;
+    if(!controller1.visible) selectionMesh.visible = false;
     if(tvMainScene)    tvMainScene.update(dt);
     if(tvContactScene) tvContactScene.update(dt);
     if(tvMenuScene) tvMenuScene.update(dt);
@@ -230,6 +248,8 @@ function onAssetsLoaded(){
     scene.add(cameraParentObject);
 
     cameraParentObject.position.copy(camera.position)
+
+    scene.add(selectionMesh);
 
     setTimeout(initMain, 0);
 
